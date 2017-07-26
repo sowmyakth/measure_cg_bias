@@ -101,7 +101,7 @@ def get_gal(Args, cat, get_seds=False):
     #  composite SED
     seds = [Args.b_SED * (1 / norm_b), Args.d_SED * (1 / norm_d)]
     Args.c_SED = Args.b_SED + Args.d_SED
-    PSF = cg_fn.get_PSF(Args)
+    PSF = cg_fn.get_gaussian_PSF(Args)
     gal = cg_fn.get_gal_cg(Args)
     con = galsim.Convolve([gal, PSF])
     if get_seds:
