@@ -143,7 +143,7 @@ def main(params):
         indx = indexs[n]
         print "Running on index ", indx
         rng = galsim.random.BaseDeviate(indx)
-        assert((comp_cat[filt]['IDENT'][n] == index_table['IDENT_1'][n]))
+        assert((comp_cat[in_filters[1]]['IDENT'][n] == index_table['IDENT_1'][n]))
         assert((index_table['IDENT_1'][n] == index_table['IDENT_2'][n]))
         rg_v = galsim.RealGalaxy(rgc[0], id=index_table['IDENT_1'][n])
         assert(indx == rg_v.index)
