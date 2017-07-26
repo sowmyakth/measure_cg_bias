@@ -1,8 +1,8 @@
 """ Functions for color gradient(CG) analysis.
 
 Define functions to measure bias from CG in shape measurements. Create galaxy
-with CG using GalSim. Compare it's calculated shape to galaxy without CG as defined
-in Semboloni et al. (2013). Galaxy shape can be
+with CG using GalSim. Compare it's calculated shape to galaxy without CG as
+defined in Semboloni et al. (2013). Galaxy shape can be
 measured by either HSM module in GalSim or direct momemtsvcalculation without
 PSF correction.
 
@@ -236,7 +236,7 @@ def param_in(Args):
     """To make sure every fit gets the same initial params.
     Else multiple runs take parameters of previous fit
     @param   params   parameters class for fit
-    @returns parameters with preset values""" 
+    @returns parameters with preset values"""
     d = (1 + 0.1 * np.random.random())
     params = Parameters()
     params.add('g1', value=0.1, vary=True, min=-1., max=1.)
@@ -279,12 +279,10 @@ def get_moments(array):
 
 
 def estimate_shape(Args, gal_img, PSF_img, method):
-    """ Estimate the shape (ellipticity) of a galaxy. 
-
-    Shape is calculated by either one of the HSM methods or by direct 
+    """ Estimate the shape (ellipticity) of a galaxy.
+    Shape is calculated by either one of the HSM methods or by direct
     calculation of moments wihtout any PSF correction. Of the HSM
     methods, KSB has the option of manually setting size of weight function.
-
 
     @param Args    Class with the following attributes:
         Args.sig_w  Sigma of Gaussian weight function.
@@ -311,25 +309,29 @@ def estimate_shape(Args, gal_img, PSF_img, method):
                                           max_moment_nsig2=40000)
         try:
             result = galsim.hsm.EstimateShear(gal_img, PSF_img,
-            	                              shear_est=method,
-            	                              hsmparams=new_params)
-            shape = galsim.Shear(e1=result.corrected_e1, e2=result.corrected_e2)
+                                              shear_est=method,
+                                              hsmparams=new_params)
+            shape = galsim.Shear(e1=result.corrected_e1,
+                                 e2=result.corrected_e2)
         except:
             return "Fail"
 
     elif method == 'KSB':
-        if Args.sig_w :
+        if Args.sig_w:
             #Manually set size of weight fn in HSM
             new_params = galsim.hsm.HSMParams(ksb_sig_weight=Args.sig_w / Args.scale,
                                               nsig_rg=200, nsig_rg2=200,
                                               max_moment_nsig2=40000)
-            result = galsim.hsm.EstimateShear(gal_img, PSF_img, shear_est=method,
+            result = galsim.hsm.EstimateShear(gal_img, PSF_img,
+                                              shear_est=method,
                                               hsmparams=new_params)
         else:
             #Weight size is not given; HSM calculates the appropriate weight
-            new_params = galsim.hsm.HSMParams(nsig_rg=200, nsig_rg2=200,
+            new_params = galsim.hsm.HSMParams(nsig_rg=200,
+                                              nsig_rg2=200,
                                               max_moment_nsig2=40000)
-            result = galsim.hsm.EstimateShear(gal_img, PSF_img, shear_est=method,
+            result = galsim.hsm.EstimateShear(gal_img, PSF_img,
+                                              shear_est=method,
                                               hsmparams=new_params)
         shape = galsim.Shear(g1=result.corrected_g1, g2=result.corrected_g2)
     elif method == 'fit':
@@ -338,7 +340,7 @@ def estimate_shape(Args, gal_img, PSF_img, method):
         fit_kws = {'maxfev':1000, 'ftol':1.49012e-38, 'xtol':1.49012e-38}
         chr_psf = get_PSF(Args)
         result = minimize(fcn2min, params,
-        	              args=(data, Args, chr_psf), **fit_kws)
+                          args=(data, Args, chr_psf), **fit_kws)
         shape = galsim.Shear(g1=result.params['g1'].value,
                              g2=result.params['g2'].value)
     return shape
@@ -359,7 +361,7 @@ def ring_test_single_gal(Args, gal,
     star = galsim.Gaussian(half_light_radius=1e-9) * Args.c_SED
     con = galsim.Convolve(chr_PSF,star)
     PSF_img = con.drawImage(Args.bp, nx=Args.npix,
-    	                    ny=Args.npix, scale=Args.scale)
+                            ny=Args.npix, scale=Args.scale)
     n = len(Args.rt_g)
     ghat = np.zeros([n, 2])
     T = n * Args.n_ring * 2
@@ -370,7 +372,7 @@ def ring_test_single_gal(Args, gal,
         betas = np.linspace(0.0, 360.0, 2 * Args.n_ring, endpoint=False) / 2.
         for beta in betas:
             gal1 = gal.rotate(beta * galsim.degrees).shear(g1=g[0],
-            	                                           g2=g[1])
+                                                           g2=g[1])
             obj = galsim.Convolve(gal1, chr_PSF)
             img = obj.drawImage(bandpass=Args.bp,
                                 nx=Args.npix, ny=Args.npix,
@@ -378,8 +380,8 @@ def ring_test_single_gal(Args, gal,
             if noise_sigma:
                 gaussian_noise = galsim.GaussianNoise(rng, noise_sigma)
                 img.addNoise(gaussian_noise)
-            result   = estimate_shape(Args, img,
-            	                      PSF_img, Args.shear_est)
+            result = estimate_shape(Args, img,
+                                    PSF_img, Args.shear_est)
             if result is "Fail":
                 return "Fail"
             del gal1, obj, img
@@ -393,25 +395,26 @@ def getFWHM(image):
     """Calculate FWHM of image.
 
     Compute the circular area of profile that is greater than half the maximum
-    value. The diameter of this circle is the FWHM. Note: Method applicable 
+    value. The diameter of this circle is the FWHM. Note: Method applicable
     only to circular profiles.
     @param image    Array of profile whose FWHM is to be computed
     @return         FWHM in pixels"""
     mx = image.max()
-    ahm = (image > mx/2.0).sum()
+    ahm = (image > mx / 2.0).sum()
     return np.sqrt(4.0 / np.pi * ahm)
+
 
 def getHLR(image):
     """Function to calculate Half light radius of image.
 
-    Compute the flux within a circle of increasing radius, till the enclosed 
+    Compute the flux within a circle of increasing radius, till the enclosed
     flux is greater than half the total flux. Lower bound on HLR is calculated
     from the FWHM. Note: Method applicable only to circular profiles.
 
     @param image    Array of profile whose half light radius(HLR) is to be computed.
     @return         HLR in pixels"""
     # index of max value; center
-    max_x,max_y = np.unravel_index(image.argmax(),
+    max_x, max_y = np.unravel_index(image.argmax(),
                                    image.shape) 
     flux = image.sum()
     # fwhm ~ 2 HLR. HLR will be larger than fwhm/4
@@ -433,17 +436,17 @@ def get_rad_sum(image, ro, xo, yo):
     @return         flux within given radius. """
     area = 0.
     xrng = range(xo - ro, xo + ro)
-    yrng =range(yo-ro,yo+ro)
+    yrng = range(yo - ro, yo + ro)
     for x in xrng:
         for y in yrng:
-            if (x-xo)**2+(y-yo)**2 <ro**2 :
-                area+=image[x,y]
-    return area 
+            if (x - xo)**2 + (y - yo)**2 < ro**2:
+                area += image[x, y]
+    return area
 
 
 def calc_cg_crg(crg, meas_args,
                 psf_args, calc_weight=False):
-    """Compute shape of galaxy with CG and galaxy with no CG 
+    """Compute shape of galaxy with CG and galaxy with no CG
     @param Args         Class with the following attributes:
         Args.telescope  Telescope the CG bias of which is to be meaasured
                         (Euclid or LSST)
@@ -463,9 +466,9 @@ def calc_cg_crg(crg, meas_args,
     print " Get gal with no CG"
     gal_nocg = get_gal_nocg(meas_args, gal_cg,
                             chr_psf)
-    # compute HLR of galaxy with CG and set it as the size of the weight function
+    # compute HLR of galaxy with CG & set it as the size of the weight function
     if calc_weight is True:
-        con_cg = (galsim.Convolve(gal_cg,chr_psf))
+        con_cg = (galsim.Convolve(gal_cg, chr_psf))
         im1 = con_cg.drawImage(meas_args.bp, nx=meas_args.npix,
                                ny=meas_args.npix, scale=meas_args.scale)
         meas_args.sig_w = (getHLR(im1.array) * meas_args.scale)
