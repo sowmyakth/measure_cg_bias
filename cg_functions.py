@@ -278,12 +278,11 @@ def param_in(Args):
 
 def get_PSF(Args):
     """ Return a chromatic PSF. Size of PSF is wavelength dependent.
-
-    @param Args    Class with the following attributes:
-        Args.psf_sigma_o   Gaussian sigma of PSF at known wavelength Args.psf_w_o.
-        Args.psf_w_o       Wavelength at which PSF size is known (nm).
-        Args.alpha         PSF wavelength scaling exponent.  1.0 for diffraction 
-                           limit, -0.2 for Kolmogorov turbulence.
+    @param Args        Class with the following attributes:
+    Args.psf_sigma_o   Gaussian sigma of PSF at known wavelength Args.psf_w_o.
+    Args.psf_w_o       Wavelength at which PSF size is known (nm).
+    Args.alpha         PSF wavelength scaling exponent.  1.0 for diffraction
+                       limit, -0.2 for Kolmogorov turbulence.
     @return chromatic PSF.
     """
     mono_PSF = galsim.Gaussian(sigma=Args.psf_sigma_o)
@@ -440,11 +439,12 @@ def getHLR(image):
     flux is greater than half the total flux. Lower bound on HLR is calculated
     from the FWHM. Note: Method applicable only to circular profiles.
 
-    @param image    Array of profile whose half light radius(HLR) is to be computed.
+    @param image    Array of profile whose half light radius(HLR)
+                    is to be computed.
     @return         HLR in pixels"""
     # index of max value; center
     max_x, max_y = np.unravel_index(image.argmax(),
-                                   image.shape) 
+                                    image.shape) 
     flux = image.sum()
     # fwhm ~ 2 HLR. HLR will be larger than fwhm/4
     low_r = getFWHM(image) / 4.                                   
