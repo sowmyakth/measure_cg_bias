@@ -276,20 +276,6 @@ def param_in(Args):
     return params
 
 
-def get_PSF(Args):
-    """ Return a chromatic PSF. Size of PSF is wavelength dependent.
-    @param Args        Class with the following attributes:
-    Args.psf_sigma_o   Gaussian sigma of PSF at known wavelength Args.psf_w_o.
-    Args.psf_w_o       Wavelength at which PSF size is known (nm).
-    Args.alpha         PSF wavelength scaling exponent.  1.0 for diffraction
-                       limit, -0.2 for Kolmogorov turbulence.
-    @return chromatic PSF.
-    """
-    mono_PSF = galsim.Gaussian(sigma=Args.psf_sigma_o)
-    chr_PSF = galsim.ChromaticObject(mono_PSF).dilate(lambda w: (w/Args.psf_w_o)**Args.alpha)
-    return chr_PSF
-
-
 def get_moments(array):
     """ Compute second central moments of an array.
     @param array  Array of profile to calculate second moments
@@ -366,7 +352,7 @@ def estimate_shape(Args, gal_img, PSF_img, method):
         params = param_in(Args)
         data = (gal_img.array).flatten()
         fit_kws = {'maxfev': 1000, 'ftol': 1.49012e-38, 'xtol': 1.49012e-38}
-        chr_psf = get_PSF(Args)
+        chr_psf = get_gaussian_PSF(Args)
         result = minimize(fcn2min, params,
                           args=(data, Args, chr_psf), **fit_kws)
         shape = galsim.Shear(g1=result.params['g1'].value,
