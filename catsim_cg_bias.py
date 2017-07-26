@@ -37,9 +37,9 @@ def get_rand_gal(params):
     cond3 = cat['i_ab'] <= 25.3
     # Dont pick too large galaxies
     cond4 = (cat['DiskHalfLightRadius'] < 3) & (cat['BulgeHalfLightRadius'] < 3)
-    # cond5 = (cat['DiskHalfLightRadius'] > 0.2) ^ (cat['BulgeHalfLightRadius'] > 0.2)
-    q, =  np.where(cond1 & cond2 & cond3 & cond4)  # & cond5)
-    indices = range(int(params.num) * int(params.size), (int(params.num) + 1) * int(params.size))
+    q, =  np.where(cond1 & cond2 & cond3 & cond4)
+    indices = range(int(params.num) * int(params.size),
+                    (int(params.num) + 1) * int(params.size))
     new_cat = cat[q]
     return new_cat[indices], indices
 
@@ -49,15 +49,16 @@ def get_npix(cat, scale, psf_sig):
     The dimensions are set by the larger of disk, bulge and psf.
     @cat         catsim row with galaxy parameters
     @scale       size of the pixel when the galaxy is drawn
-    @psf_sig     size of the psf 
-    returns number of pixels in x and y axes. 
+    @psf_sig     size of the psf
+    returns number of pixels in x and y axes.
     """
     a_max = max(cat['a_b'], cat['a_d'], 2 * psf_sig)
     b_max = max(cat['b_b'], cat['b_d'], 2 * psf_sig)
     ellip = 1 - b_max / a_max
     theta = cat['pa_bulge'] * np.pi / 180.
-    nx = 5 * a_max * (np.abs(np.sin(theta)) + (1 - ellip) * np.abs(np.cos(theta)))
-    ny = 5 * a_max * (np.abs(np.cos(theta)) + (1 - ellip) * np.abs(np.sin(theta)))
+    cost, sint = np.abs(np.cos(theta)), np.abs(np.sin(theta))
+    nx = 5 * a_max * (sint + (1 - ellip) * cost)
+    ny = 5 * a_max * (cost + (1 - ellip) * sint)
     return int(nx / scale), int(ny / scale)
 
 
@@ -67,7 +68,8 @@ def get_catsim_SED(sed_name, redshift=0., a_v=None,
     extinction.
     @param sed_file    Name of file with SED information.
     @flux_norm         Multiplicative scaling factor to apply to the SED.
-    @bandpass          GalSim bandpass object which models the transmission fraction.
+    @bandpass          GalSim bandpass object which models the transmission
+                       fraction.
     @ redshift         Redshift of the galaxy.
     @a_v               Total V band extinction, in magnitudes.
     @r_v               Extinction R_V parameter.
@@ -115,8 +117,8 @@ def redden(SED, a_v, r_v, model):
     Catsim SED has bluelimit 16nm, so make sure we don't use high z
     ## Do not use redshifts higher than 1.4 !!!!!!!!!
     """
-    return SED *(lambda w: 1 if np.any(w < 125) else 1/extinction.reddening(w*10, a_v=a_v,
-                                                                            r_v=r_v, model=model))
+    return SED * (lambda w: 1 if np.any(w < 125) else 1 / extinction.reddening(w * 10, a_v=a_v,
+                                                                               r_v=r_v, model=model))
 
 
 def a_b2re_e(a, b):
@@ -173,7 +175,7 @@ def get_eff_psf(chr_PSF, sed, bands):
 def get_CRG(cat, rng, row):
     """Create CRG for a given input parametrs form catsim.
     Bulge + Disk galaxy is created, convolved with HST PSF, drawn in HST V and
-    I bands for 1 second exposure. Correlated noise (computed from AEGIS images)
+    I bands for 1 second exposure. Correlated noise (from AEGIS images)
     is added to each image. SNR in a gaussian elliptical aperture is computed.
     cgr1: The galaxy +psf images + noise correlation function is provided as
     input to CRG with default polynomial SEDs.
@@ -268,12 +270,13 @@ def get_CRG(cat, rng, row):
     gal_im_i_pad = intp_gal_i._pad_image
     print "CRG input im shape ", gal_im_v_pad.array.shape[0] * scale
     #  Polynomial SEDs
-    crg1 = galsim.ChromaticRealGalaxy.makeFromImages(images=[gal_im_v_pad, gal_im_i_pad],
+    images = [gal_im_v_pad, gal_im_i_pad]
+    crg1 = galsim.ChromaticRealGalaxy.makeFromImages(images=images,
                                                      bands=[V, I],
                                                      xis=[xi_v, xi_i],
                                                      PSFs=eff_PSFs)
     #  True SEDs
-    crg2 = galsim.ChromaticRealGalaxy.makeFromImages(images=[gal_im_v_pad, gal_im_i_pad],
+    crg2 = galsim.ChromaticRealGalaxy.makeFromImages(images=images,
                                                      bands=[V, I],
                                                      xis=[xi_v, xi_i],
                                                      PSFs=eff_PSFs,
@@ -291,7 +294,7 @@ def get_flux(ab_magnitude, exposure_time, zero_point):
     airmass =1.2
     zeropint is at airmass 1.2
     """
-    return exposure_time*zero_point*10**(-0.4*(ab_magnitude - 24))
+    return exposure_time * zero_point * 10**(-0.4 * (ab_magnitude - 24))
 
 
 def get_lsst_noise(cat, rng, row):
@@ -432,7 +435,8 @@ def get_lsst_para(cat):
 
 
 def main(params):
-    """Measures bias from cg for a parametric galaxy and the same galaxy through CRG """
+    """Measures bias from cg for a parametric galaxy and the same galaxy
+    through CRG """
     print 'Running on num {0}'.format(params.num)
     # input shear
     g = np.linspace(0.005, 0.01, 2)
