@@ -232,6 +232,35 @@ def get_gal_nocg(Args, gal_cg,
     return gal_nocg * Args.c_SED
 
 
+def fcn2min(params, data,
+	        Args, psf):
+    """Function given as input to lmfit, to compute residual of fit and true
+    galaxy (galaxy with no CG)
+    @param params  fit parameters
+    @param data    true data
+    @param Args
+    @param mod_psf psf
+    @returns difference betwwen fit and true"""
+    g1 = params['g1'].value       # shear of galaxy
+    g2 = params['g2'].value       # shear of galaxy
+    rb = params['rb'].value       # half light radius of buldge
+    rd = params['rd'].value       # half light radius disk
+    bf = params['bf'].value       # ratio Flux of buldge to total flux
+
+    mod_bulge = galsim.Sersic(n=Args.bulge_n, half_light_radius=rb,
+                              flux=Args.T_flux * bf)
+    mod_disk = galsim.Sersic(n=Args.disk_n, half_light_radius=rd,
+                             flux=Args.T_flux * (1 - bf))
+    mod_gal = (mod_bulge + mod_disk) * Args.c_SED
+    mod_gal = mod_gal.shear(g1=g1, g2=g2)
+    obj_con = galsim.Convolve(mod_gal, psf)
+    mod_im = (obj_con.drawImage(bandpass=Args.bp, scale=Args.scale,
+                                nx=Args.npix, ny=Args.npix)).array
+    model1 = mod_im.flatten()
+    resid = model1 - data
+    return resid
+
+
 def param_in(Args):
     """To make sure every fit gets the same initial params.
     Else multiple runs take parameters of previous fit
