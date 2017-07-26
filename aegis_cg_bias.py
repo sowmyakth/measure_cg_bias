@@ -165,8 +165,7 @@ def main(params):
                       noise_pad=True, noise_pad_size=noise_pad_size)
         meas_cg_bias(CRG, index_table[n], params.filter,
                      rt_g, 'CRG', npix)
-    # path = '/nfs/slac/g/ki/ki19/deuce/AEGIS/data_test_CRG/results/cg_test/full/CRG_AEGIS/'
-    path = 'delete/'
+    path = '/nfs/slac/g/ki/ki19/deuce/AEGIS/data_test_CRG/results/cg_test/full/CRG_AEGIS/'
     op_file = path + 'AEGIS_cg_CRG_{0}_{1}_band.fits'.format(params.num,
                                                              params.filter)
     index_table.write(op_file, format='fits',
