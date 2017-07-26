@@ -185,7 +185,7 @@ def get_gaussian_PSF(Args):
     @param     Class with the following attributes:
         sigma_o   Gaussian sigma of PSF at known wavelength Args.psf_w_o.
         w_o       Wavelength at which PSF size is known (nm).
-        alpha     PSF wavelength scaling exponent.  1.0 for diffraction 
+        alpha     PSF wavelength scaling exponent.  1.0 for diffraction
                            limit, -0.2 for Kolmogorov turbulence.
     @return chromatic PSF.
     """
@@ -233,7 +233,7 @@ def get_gal_nocg(Args, gal_cg,
 
 
 def fcn2min(params, data,
-	        Args, psf):
+            Args, psf):
     """Function given as input to lmfit, to compute residual of fit and true
     galaxy (galaxy with no CG)
     @param params  fit parameters
@@ -318,9 +318,9 @@ def estimate_shape(Args, gal_img, PSF_img, method):
         Args.scale  Pixel scale of postage stamp image.
     @param gal_img  A GalSim Image of the PSF-convolved galaxy.
     @param PSF_img  A GalSim Image of the PSF.
-    @param method   Method to use to estimate shape.  One of:
-        'S13'  Use Semboloni++13 observed second moments method 
-        'REGAUSS', 'LINEAR', 'BJ', 'KSB'  Use GalSim.hsm module
+    @param method   Method to use to estimate shape. One of:
+                    'S13' (Use Semboloni++13 observed second moments method)
+                    'REGAUSS', 'LINEAR', 'BJ', 'KSB' (Use GalSim.hsm module)
     @returns galsim.Shear object holding galaxy ellipticity.
     """
     if method == 'S13':
@@ -346,7 +346,7 @@ def estimate_shape(Args, gal_img, PSF_img, method):
 
     elif method == 'KSB':
         if Args.sig_w:
-            #Manually set size of weight fn in HSM
+            # Manually set size of weight fn in HSM
             new_params = galsim.hsm.HSMParams(ksb_sig_weight=Args.sig_w / Args.scale,
                                               nsig_rg=200, nsig_rg2=200,
                                               max_moment_nsig2=40000)
@@ -354,7 +354,7 @@ def estimate_shape(Args, gal_img, PSF_img, method):
                                               shear_est=method,
                                               hsmparams=new_params)
         else:
-            #Weight size is not given; HSM calculates the appropriate weight
+            # Weight size is not given; HSM calculates the appropriate weight
             new_params = galsim.hsm.HSMParams(nsig_rg=200,
                                               nsig_rg2=200,
                                               max_moment_nsig2=40000)
@@ -365,7 +365,7 @@ def estimate_shape(Args, gal_img, PSF_img, method):
     elif method == 'fit':
         params = param_in(Args)
         data = (gal_img.array).flatten()
-        fit_kws = {'maxfev':1000, 'ftol':1.49012e-38, 'xtol':1.49012e-38}
+        fit_kws = {'maxfev': 1000, 'ftol': 1.49012e-38, 'xtol': 1.49012e-38}
         chr_psf = get_PSF(Args)
         result = minimize(fcn2min, params,
                           args=(data, Args, chr_psf), **fit_kws)
@@ -382,12 +382,12 @@ def ring_test_single_gal(Args, gal,
         Args.scale      Pixel scale of postage stamp image
         Args.n_ring     Number of intrinsic ellipticity pairs around ring.
         Args.shear_est  Method to use to estimate shape.
-        Args.sig_w      For S13 method, the width (sigma) of the Gaussian 
+        Args.sig_w      For S13 method, the width (sigma) of the Gaussian
                         weight funcion.
     @return  Multiplicate bias estimate.
     """
     star = galsim.Gaussian(half_light_radius=1e-9) * Args.c_SED
-    con = galsim.Convolve(chr_PSF,star)
+    con = galsim.Convolve(chr_PSF, star)
     PSF_img = con.drawImage(Args.bp, nx=Args.npix,
                             ny=Args.npix, scale=Args.scale)
     n = len(Args.rt_g)
@@ -443,10 +443,10 @@ def getHLR(image):
     @return         HLR in pixels"""
     # index of max value; center
     max_x, max_y = np.unravel_index(image.argmax(),
-                                    image.shape) 
+                                    image.shape)
     flux = image.sum()
     # fwhm ~ 2 HLR. HLR will be larger than fwhm/4
-    low_r = getFWHM(image) / 4.                                   
+    low_r = getFWHM(image) / 4.
     for r in range(np.int(low_r), len(image) / 2):
         if get_rad_sum(image, r, max_x, max_y) > flux / 2.:
             return r - 1
@@ -484,9 +484,12 @@ def calc_cg_crg(crg, meas_args,
         Args.c_SED      Flux weighted composite SED.
         Args.scale      Pixel scale of postage stamp image.
         Args.n_ring     Number of intrinsic ellipticity pairs around ring.
-        Args.shear_est  Method to use to estimate shape.  See `estimate_shape` docstring.
-        Args.sig_w      For S13 method, the width (sigma) of the Gaussian weight funcion.
-    @param cal_weight   if True, manually computes size of galaxy and sets it as weight size
+        Args.shear_est  Method to use to estimate shape.  See `estimate_shape`
+                        docstring.
+        Args.sig_w      For S13 method, the width (sigma) of the Gaussian
+                        weight funcion.
+    @param cal_weight   if True, manually computes size of galaxy and sets it
+                        as weight size
     @return  Shape of galaxy with CG, shape of galaxy with no CG ."""
     chr_psf = get_gaussian_PSF(psf_args)
     gal_cg = crg
