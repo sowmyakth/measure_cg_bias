@@ -128,32 +128,32 @@ def a_b2re_e(a, b):
 
 
 def get_HST_Bandpass(band):
-        """Returns a Bandpass object for the catalog.
-        Using similar code from real.py in Galsim
-        """
-        # Currently, have bandpasses available for HST COSMOS, AEGIS, and CANDELS.
-        # ACS zeropoints (AB magnitudes) from
-        # http://www.stsci.edu/hst/acs/analysis/zeropoints/old_page/localZeropoints#tablestart
-        # WFC3 zeropoints (AB magnitudes) from
-        # http://www.stsci.edu/hst/wfc3/phot_zp_lbn
-        bps = {'F275W': ('WFC3_uvis_F275W.dat', 24.1305),
-               'F336W': ('WFC3_uvis_F336W.dat', 24.6682),
-               'F435W': ('ACS_wfc_F435W.dat', 25.65777),
-               'F606W': ('ACS_wfc_F606W.dat', 26.49113),
-               'F775W': ('ACS_wfc_F775W.dat', 25.66504),
-               'F814W': ('ACS_wfc_F814W.dat', 25.94333),
-               'F850LP': ('ACS_wfc_F850LP.dat', 24.84245),
-               'F105W': ('WFC3_ir_F105W.dat', 26.2687),
-               'F125W': ('WFC3_ir_F125W.dat', 26.2303),
-               'F160W': ('WFC3_ir_F160W.dat', 25.9463)
-               }
-        try:
-            bp = bps[band.upper()]
-        except KeyError:
-            raise ValueError("Unknown bandpass {0}".format(band))
-        fn = os.path.join(galsim.meta_data.share_dir, "bandpasses", bp[0])
-        bandpass = galsim.Bandpass(fn, wave_type='nm', zeropoint=bp[1])
-        return bandpass.thin(rel_err=1e-4)
+    """Returns a Bandpass object for the catalog.
+    Using similar code from real.py in Galsim
+    """
+    # Currently, have bandpasses available for HST COSMOS, AEGIS, and CANDELS.
+    # ACS zeropoints (AB magnitudes) from
+    # http://www.stsci.edu/hst/acs/analysis/zeropoints/old_page/localZeropoints#tablestart
+    # WFC3 zeropoints (AB magnitudes) from
+    # http://www.stsci.edu/hst/wfc3/phot_zp_lbn
+    bps = {'F275W': ('WFC3_uvis_F275W.dat', 24.1305),
+           'F336W': ('WFC3_uvis_F336W.dat', 24.6682),
+           'F435W': ('ACS_wfc_F435W.dat', 25.65777),
+           'F606W': ('ACS_wfc_F606W.dat', 26.49113),
+           'F775W': ('ACS_wfc_F775W.dat', 25.66504),
+           'F814W': ('ACS_wfc_F814W.dat', 25.94333),
+           'F850LP': ('ACS_wfc_F850LP.dat', 24.84245),
+           'F105W': ('WFC3_ir_F105W.dat', 26.2687),
+           'F125W': ('WFC3_ir_F125W.dat', 26.2303),
+           'F160W': ('WFC3_ir_F160W.dat', 25.9463)
+           }
+    try:
+        bp = bps[band.upper()]
+    except KeyError:
+        raise ValueError("Unknown bandpass {0}".format(band))
+    fn = os.path.join(galsim.meta_data.share_dir, "bandpasses", bp[0])
+    bandpass = galsim.Bandpass(fn, wave_type='nm', zeropoint=bp[1])
+    return bandpass.thin(rel_err=1e-4)
 
 
 def get_eff_psf(chr_PSF, sed, bands):
@@ -383,8 +383,8 @@ def get_lsst_noise(cat, rng, row):
     row['LSST_target_flux'] = t_fluxs
 
 
-def meas_cg_bias(gal, row, filter,
-                 rt_g, type, npix=360):
+def meas_cg_bias(gal, row, f_name,
+                 rt_g, f_type, npix=360):
     """Computes bias due to color gradient on sahpe measuremnt.
     For an input chromatic galaxy with cg,  gal an equilvalent galaxy with
     no cg is created and the shear recovered from each (with ring test) is
@@ -395,7 +395,7 @@ def meas_cg_bias(gal, row, filter,
     @type    string to identify the column of row to save measured shear.
     """
     print " Measuring CG bias"
-    filt = galsim.Bandpass('data/baseline/total_%s.dat'%filter,
+    filt = galsim.Bandpass('data/baseline/total_%s.dat'%f_name,
                            wave_type='nm').thin(rel_err=1e-4)
     meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix)
     meas_args.bp = filt
@@ -406,8 +406,8 @@ def meas_cg_bias(gal, row, filter,
         print "HSM FAILED"
         g_f = np.ones([2, len(rt_g)]) * -10
         gcg, gnocg = g_f, g_f
-    row[type + '_g_cg'] = gcg.T
-    row[type + '_g_no_cg'] = gnocg.T
+    row[f_type + '_g_cg'] = gcg.T
+    row[f_type + '_g_no_cg'] = gnocg.T
 
 
 def get_lsst_para(cat):
@@ -453,9 +453,6 @@ def main(params):
                  shape=(2, 2), dtype='f8')
     index_table.add_column(col)
     col = Column(np.zeros([num, len(rt_g), 2]), name='para_g_no_cg',
-                 shape=(2, 2), dtype='f8')
-    index_table.add_column(col)
-    col = Column(np.zeros([num, len(rt_g), 2]), name='CRG_pad_g_cg',
                  shape=(2, 2), dtype='f8')
     index_table.add_column(col)
     col = Column(np.zeros([num, len(rt_g), 2]), name='CRG_g_cg',
@@ -530,8 +527,7 @@ def main(params):
                      rt_g, 'para', npix)
         get_lsst_noise(catsim_gals[n], rng, index_table[n])
         index_table['rt_g'] = rt_g
-    # path = '/nfs/slac/g/ki/ki19/deuce/AEGIS/data_test_CRG/results/cg_test/full/CRG_catsim_padded/'
-    path = 'delete/'
+    path = '/nfs/slac/g/ki/ki19/deuce/AEGIS/data_test_CRG/results/cg_test/full/CRG_catsim_padded/'
     op_file = path + 'catsim_cg_bias_{0}_{1}_band.fits'.format(params.num,
                                                                params.filter)
     index_table.write(op_file, format='fits',
