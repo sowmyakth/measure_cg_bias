@@ -31,7 +31,7 @@ def make_Euclid_filter(res=1.0):
     return galsim.Bandpass(galsim.LookupTable(w, tab(w), interpolant='linear'))
 
 
-class meas_args():
+class meas_args(object):
     """Class containing input parameters for measurement
     @npix    Number of pixels across postage stamp image.
     @scale  Pixel scale of postage stamp image.
@@ -51,7 +51,7 @@ class meas_args():
         self.bp = None
 
 
-class Eu_Args():
+class Eu_Args(object):
     """Class containing input parameters for Euclid"""
     def __init__(self, npix=360, scale=0.05,
                  psf_sig_o=0.102, psf_w_o=800,
@@ -90,7 +90,7 @@ class Eu_Args():
         self.rt_g = rt_g
 
 
-class LSST_Args():
+class LSST_Args(object):
     """Class containing input parameters for LSST
     @npix    Number of pixels across postage stamp image.
     @scale  Pixel scale of postage stamp image.
@@ -144,7 +144,7 @@ class LSST_Args():
         self.rt_g = rt_g
 
 
-class psf_params():
+class psf_params(object):
     """Parametrs describing a chromatic LSST PSF"""
     def __init__(self, sigma_o=0.297,
                  w_o=550, alpha=-0.2):
@@ -392,10 +392,9 @@ def ring_test_single_gal(Args, gal,
                             ny=Args.npix, scale=Args.scale)
     n = len(Args.rt_g)
     ghat = np.zeros([n, 2])
-    T = n * Args.n_ring * 2
     random_seed = 141508
     rng = galsim.BaseDeviate(random_seed)
-    for i,g in enumerate(Args.rt_g):
+    for i, g in enumerate(Args.rt_g):
         gsum = []
         betas = np.linspace(0.0, 360.0, 2 * Args.n_ring, endpoint=False) / 2.
         for beta in betas:
