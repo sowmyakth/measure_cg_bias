@@ -18,6 +18,7 @@ def get_xis(rgc, use_index, rng):
     xis = []
     for r in rgc:
         noise_image, pixel_scale, var = r.getNoiseProperties(use_index)
+        print "pixel scale ", pixel_scale
         # Make sure xi image is odd-sized.
         if noise_image.array.shape[0] % 2 == 0:
             bds = noise_image.bounds
