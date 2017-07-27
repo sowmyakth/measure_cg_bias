@@ -129,20 +129,6 @@ def a_b2re_e(a, b):
     return re, e
 
 
-def get_eff_psf(chr_PSF, sed, bands):
-    """returns galsim interpolated image of the effective PSF, i.e image of
-    the chromatic PSF in each band, for a given SED.
-    """
-    V, I = bands[0], bands[1]
-    star = galsim.Gaussian(half_light_radius=1e-9) * sed
-    con = galsim.Convolve(chr_PSF, star)
-    PSF_img_V = con.drawImage(V, nx=40, ny=40, scale=0.03)
-    PSF_img_I = con.drawImage(I, nx=40, ny=40, scale=0.03)
-    PSF_V = galsim.InterpolatedImage(PSF_img_V, flux=1.)
-    PSF_I = galsim.InterpolatedImage(PSF_img_I, flux=1.)
-    return [PSF_V, PSF_I]
-
-
 def get_CRG(cat, rng, row):
     """Create CRG for a given input parametrs form catsim.
     Bulge + Disk galaxy is created, convolved with HST PSF, drawn in HST V and
@@ -228,7 +214,9 @@ def get_CRG(cat, rng, row):
                                  variance=var_v, rng=rng)
     xi_i = galsim.getCOSMOSNoise(file_name='data/acs_I_unrot_sci_cf.fits',
                                  variance=var_i, rng=rng)
-    eff_PSFs = get_eff_psf(PSF, c_sed, [V, I])
+    psf_v = cg_fn.get_eff_psf(PSF, c_sed, V)
+    psf_i = cg_fn.get_eff_psf(PSF, c_sed, I)
+    eff_PSFs = [psf_v, psf_i]
     print "Creating CRG with noise padding"
     cg_size = int(max(cat['BulgeHalfLightRadius'],
                       cat['DiskHalfLightRadius'], 2 * psf_sig) * 12)

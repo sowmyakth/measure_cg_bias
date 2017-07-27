@@ -152,8 +152,21 @@ class psf_params(object):
     def __init__(self, sigma_o=0.297,
                  w_o=550, alpha=-0.2):
         self.psf_sigma_o = sigma_o
-        self.pas_w_o = w_o
-        self.psf_alpha = alpha
+        self.psf_w_o = w_o
+        self.alpha = alpha
+
+
+def get_eff_psf(chr_PSF, sed, band,
+                nx=40, ny=40, scale=0.03):
+    """returns galsim interpolated image of the effective PSF, i.e image of
+    the chromatic PSF in the input band, for a given SED.
+    """
+    star = galsim.Gaussian(half_light_radius=1e-9) * sed
+    con = galsim.Convolve(chr_PSF, star)
+    PSF_img = con.drawImage(band, nx=nx, ny=ny,
+                            scale=scale)
+    PSF = galsim.InterpolatedImage(PSF_img, flux=1.)
+    return PSF
 
 
 def get_template_seds(Args):
@@ -251,7 +264,7 @@ def get_gaussian_PSF(Args):
     @return chromatic PSF.
     """
     mono_PSF = galsim.Gaussian(sigma=Args.psf_sigma_o)
-    chr_PSF = galsim.ChromaticObject(mono_PSF).dilate(lambda w: (w/Args.psf_w_o)**Args.psf_alpha)
+    chr_PSF = galsim.ChromaticObject(mono_PSF).dilate(lambda w: (w/Args.psf_w_o)**Args.alpha)
     return chr_PSF
 
 
