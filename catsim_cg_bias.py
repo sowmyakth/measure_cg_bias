@@ -129,35 +129,6 @@ def a_b2re_e(a, b):
     return re, e
 
 
-def get_HST_Bandpass(band):
-    """Returns a Bandpass object for the catalog.
-    Using similar code from real.py in Galsim
-    """
-    # Currently, have bandpasses available for HST COSMOS, AEGIS, and CANDELS.
-    # ACS zeropoints (AB magnitudes) from
-    # http://www.stsci.edu/hst/acs/analysis/zeropoints/old_page/localZeropoints#tablestart
-    # WFC3 zeropoints (AB magnitudes) from
-    # http://www.stsci.edu/hst/wfc3/phot_zp_lbn
-    bps = {'F275W': ('WFC3_uvis_F275W.dat', 24.1305),
-           'F336W': ('WFC3_uvis_F336W.dat', 24.6682),
-           'F435W': ('ACS_wfc_F435W.dat', 25.65777),
-           'F606W': ('ACS_wfc_F606W.dat', 26.49113),
-           'F775W': ('ACS_wfc_F775W.dat', 25.66504),
-           'F814W': ('ACS_wfc_F814W.dat', 25.94333),
-           'F850LP': ('ACS_wfc_F850LP.dat', 24.84245),
-           'F105W': ('WFC3_ir_F105W.dat', 26.2687),
-           'F125W': ('WFC3_ir_F125W.dat', 26.2303),
-           'F160W': ('WFC3_ir_F160W.dat', 25.9463)
-           }
-    try:
-        bp = bps[band.upper()]
-    except KeyError:
-        raise ValueError("Unknown bandpass {0}".format(band))
-    fn = os.path.join(galsim.meta_data.share_dir, "bandpasses", bp[0])
-    bandpass = galsim.Bandpass(fn, wave_type='nm', zeropoint=bp[1])
-    return bandpass.thin(rel_err=1e-4)
-
-
 def get_eff_psf(chr_PSF, sed, bands):
     """returns galsim interpolated image of the effective PSF, i.e image of
     the chromatic PSF in each band, for a given SED.
@@ -210,8 +181,8 @@ def get_CRG(cat, rng, row):
     input_p.T_flux = 2
     gal, PSF, con, seds = get_gal(input_p, cat, get_seds=True)
     # get bandpass
-    V = get_HST_Bandpass('F606W')
-    I = get_HST_Bandpass('F814W')
+    V = cg_fn.get_HST_Bandpass('F606W')
+    I = cg_fn.get_HST_Bandpass('F814W')
     c_sed = seds[0] + seds[1]
     temp_d = seds[1] * cat['fluxnorm_disk']
     temp_b = seds[0] * cat['fluxnorm_bulge']

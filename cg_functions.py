@@ -14,6 +14,7 @@ REGAUSS  is slower than KSB
 """
 
 import galsim
+import os
 import numpy as np
 from lmfit import minimize, Parameters
 
@@ -150,9 +151,9 @@ class psf_params(object):
     """Parametrs describing a chromatic LSST PSF"""
     def __init__(self, sigma_o=0.297,
                  w_o=550, alpha=-0.2):
-        self.sigma_o = sigma_o
-        self.w_o = w_o
-        self.alpha = alpha
+        self.psf_sigma_o = sigma_o
+        self.pas_w_o = w_o
+        self.psf_alpha = alpha
 
 
 def get_template_seds(Args):
@@ -172,7 +173,7 @@ def get_template_seds(Args):
         Args.bulge_frac        Fraction of flux in bulge at 550 nm rest-frame.
     @returns  bulge SED, disk SED, composite SED.
     """
-    path = '/data/'
+    path = 'data/'
     b_SED = galsim.SED(path + "CWW_{}_ext.sed".format(Args.bulge_SED_name),
                        wave_type='Ang', flux_type='flambda')
     d_SED = galsim.SED(path + "CWW_{}_ext.sed".format(Args.disk_SED_name),
@@ -181,6 +182,36 @@ def get_template_seds(Args):
     d_SED = d_SED.withFluxDensity(1.0, 550.0).atRedshift(Args.redshift)
     c_SED = b_SED * Args.bulge_frac + d_SED * (1. - Args.bulge_frac)
     return b_SED, d_SED, c_SED
+
+
+
+def get_HST_Bandpass(band):
+    """Returns a Bandpass object for the catalog.
+    Using similar code from real.py in Galsim
+    """
+    # Currently, have bandpasses available for HST COSMOS, AEGIS, and CANDELS.
+    # ACS zeropoints (AB magnitudes) from
+    # http://www.stsci.edu/hst/acs/analysis/zeropoints/old_page/localZeropoints#tablestart
+    # WFC3 zeropoints (AB magnitudes) from
+    # http://www.stsci.edu/hst/wfc3/phot_zp_lbn
+    bps = {'F275W': ('WFC3_uvis_F275W.dat', 24.1305),
+           'F336W': ('WFC3_uvis_F336W.dat', 24.6682),
+           'F435W': ('ACS_wfc_F435W.dat', 25.65777),
+           'F606W': ('ACS_wfc_F606W.dat', 26.49113),
+           'F775W': ('ACS_wfc_F775W.dat', 25.66504),
+           'F814W': ('ACS_wfc_F814W.dat', 25.94333),
+           'F850LP': ('ACS_wfc_F850LP.dat', 24.84245),
+           'F105W': ('WFC3_ir_F105W.dat', 26.2687),
+           'F125W': ('WFC3_ir_F125W.dat', 26.2303),
+           'F160W': ('WFC3_ir_F160W.dat', 25.9463)
+           }
+    try:
+        bp = bps[band.upper()]
+    except KeyError:
+        raise ValueError("Unknown bandpass {0}".format(band))
+    fn = os.path.join(galsim.meta_data.share_dir, "bandpasses", bp[0])
+    bandpass = galsim.Bandpass(fn, wave_type='nm', zeropoint=bp[1])
+    return bandpass.thin(rel_err=1e-4)
 
 
 def get_gal_cg(Args):
@@ -219,8 +250,8 @@ def get_gaussian_PSF(Args):
                            limit, -0.2 for Kolmogorov turbulence.
     @return chromatic PSF.
     """
-    mono_PSF = galsim.Gaussian(sigma=Args.sigma_o)
-    chr_PSF = galsim.ChromaticObject(mono_PSF).dilate(lambda w: (w/Args.w_o)**Args.alpha)
+    mono_PSF = galsim.Gaussian(sigma=Args.psf_sigma_o)
+    chr_PSF = galsim.ChromaticObject(mono_PSF).dilate(lambda w: (w/Args.psf_w_o)**Args.psf_alpha)
     return chr_PSF
 
 
