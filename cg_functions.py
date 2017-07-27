@@ -59,7 +59,8 @@ class Eu_Args(object):
                  redshift=0.3, alpha=1,
                  disk_n=1.0, bulge_n=1.5,
                  disk_e=np.array([0.0, 0.0]), bulge_e=np.array([0.0, 0.0]),
-                 bulge_HLR=0.17, disk_HLR=1.2,
+                 disk_HLR=1.2, bulge_HLR=0.17,
+                 disk_SED_name='Im', bulge_SED_name='E',
                  bulge_frac=0.25, n_ring=3,
                  rt_g=np.array([[0.01, 0.01]]), res=0.5):
         self.telescope = 'Euclid'
@@ -75,8 +76,8 @@ class Eu_Args(object):
         self.bulge_e = bulge_e
         self.disk_e = disk_e
         self.bulge_frac = bulge_frac
-        self.disk_SED_name = 'Im'
-        self.bulge_SED_name = 'E'
+        self.disk_SED_name = disk_SED_name
+        self.bulge_SED_name = bulge_SED_name
         self.b_SED = None
         self.d_SED = None
         self.c_SED = None
@@ -113,7 +114,8 @@ class LSST_Args(object):
                  sig_w=0.8, shear_est='REGAUSS',
                  disk_n=1.0, bulge_n=1.5,
                  disk_e=np.array([0.0, 0.0]), bulge_e=np.array([0.0, 0.0]),
-                 bulge_HLR=0.17, disk_HLR=1.2,
+                 disk_HLR=1.2, bulge_HLR=0.17,
+                 disk_SED_name='Im', bulge_SED_name='E',
                  bulge_frac=0.25, n_ring=3,
                  rt_g=np.array([[0.01, 0.01]]), filter_name='r'):
         self.telescope = 'LSST'
@@ -129,8 +131,8 @@ class LSST_Args(object):
         self.bulge_e = bulge_e
         self.disk_e = disk_e
         self.bulge_frac = bulge_frac
-        self.disk_SED_name = 'Im'
-        self.bulge_SED_name = 'E'
+        self.disk_SED_name = disk_SED_name
+        self.bulge_SED_name = bulge_SED_name
         self.b_SED = None
         self.d_SED = None
         self.c_SED = None
@@ -151,6 +153,34 @@ class psf_params(object):
         self.sigma_o = sigma_o
         self.w_o = w_o
         self.alpha = alpha
+
+
+def get_template_seds(Args):
+    """ Return bulge, disk and composite SEDs at given redshift.
+
+    The bulge and disk SEDs are normalized to 1.0 at 550 nm in rest-frame and
+    then redshifted. Composite SED is the flux weighted sum of bulge and disk
+    SEDs.
+
+    Note: Total flux of SEDs are not normalized.
+    @param Args    Class with the following attributes:
+        Args.disk_SED_name     One of ['Sbc', 'Scd', 'Im', 'E'] to indicate
+                               disk SED.(default: 'Im')
+        Args.bulge_SED_name    One of ['Sbc', 'Scd', 'Im', 'E'] to indicate
+                               bulge SED.(default:'E')
+        Args.redshift          Redshift of galaxy (both bulge and disk).
+        Args.bulge_frac        Fraction of flux in bulge at 550 nm rest-frame.
+    @returns  bulge SED, disk SED, composite SED.
+    """
+    path = '/data/'
+    b_SED = galsim.SED(path + "CWW_{}_ext.sed".format(Args.bulge_SED_name),
+                       wave_type='Ang')
+    d_SED = galsim.SED(path + "CWW_{}_ext.sed".format(Args.disk_SED_name),
+                       wave_type='Ang')
+    b_SED = b_SED.withFluxDensity(1.0, 550.0).atRedshift(Args.redshift)
+    d_SED = d_SED.withFluxDensity(1.0, 550.0).atRedshift(Args.redshift)
+    c_SED = b_SED * Args.bulge_frac + d_SED * (1. - Args.bulge_frac)
+    return b_SED, d_SED, c_SED
 
 
 def get_gal_cg(Args):
