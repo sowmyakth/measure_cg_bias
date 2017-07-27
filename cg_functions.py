@@ -39,7 +39,7 @@ class meas_args(object):
     """
     def __init__(self, npix=360, scale=0.2,
                  shear_est='REGAUSS', n_ring=3,
-                 rt_g=[[0.01, 0.01]], filter_name='r'):
+                 rt_g=np.array([[0.01, 0.01]]), filter_name='r'):
         self.npix = npix
         self.scale = scale
         self.shear_est = shear_est
@@ -58,10 +58,10 @@ class Eu_Args(object):
                  sig_w=None, shear_est='REGAUSS',
                  redshift=0.3, alpha=1,
                  disk_n=1.0, bulge_n=1.5,
-                 disk_e=[0.0, 0.0], bulge_e=[0.0, 0.0],
+                 disk_e=np.array([0.0, 0.0]), bulge_e=np.array([0.0, 0.0]),
                  bulge_HLR=0.17, disk_HLR=1.2,
                  bulge_frac=0.25, n_ring=3,
-                 rt_g=[[0.01, 0.01]], res=0.5):
+                 rt_g=np.array([[0.01, 0.01]]), res=0.5):
         self.telescope = 'Euclid'
         self.npix = npix
         self.scale = scale
@@ -112,10 +112,10 @@ class LSST_Args(object):
                  alpha=-0.2, redshift=0.3,
                  sig_w=0.8, shear_est='REGAUSS',
                  disk_n=1.0, bulge_n=1.5,
-                 disk_e=[0.0, 0.0], bulge_e=[0.0, 0.0],
+                 disk_e=np.array([0.0, 0.0]), bulge_e=np.array([0.0, 0.0]),
                  bulge_HLR=0.17, disk_HLR=1.2,
                  bulge_frac=0.25, n_ring=3,
-                 rt_g=[[0.01, 0.01]], filter_name='r'):
+                 rt_g=np.array([[0.01, 0.01]]), filter_name='r'):
         self.telescope = 'LSST'
         self.npix = npix
         self.scale = scale
