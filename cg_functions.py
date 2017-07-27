@@ -174,9 +174,9 @@ def get_template_seds(Args):
     """
     path = '/data/'
     b_SED = galsim.SED(path + "CWW_{}_ext.sed".format(Args.bulge_SED_name),
-                       wave_type='Ang')
+                       wave_type='Ang', flux_type='flambda')
     d_SED = galsim.SED(path + "CWW_{}_ext.sed".format(Args.disk_SED_name),
-                       wave_type='Ang')
+                       wave_type='Ang', flux_type='flambda')
     b_SED = b_SED.withFluxDensity(1.0, 550.0).atRedshift(Args.redshift)
     d_SED = d_SED.withFluxDensity(1.0, 550.0).atRedshift(Args.redshift)
     c_SED = b_SED * Args.bulge_frac + d_SED * (1. - Args.bulge_frac)
