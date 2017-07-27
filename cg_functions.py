@@ -480,7 +480,7 @@ def calc_cg_crg(crg, meas_args,
     chr_psf = get_gaussian_PSF(psf_args)
     gal_cg = crg
     meas_args.c_SED = crg.SED
-    print " Get gal with no CG"
+    # print " Get gal with no CG"
     gal_nocg = get_gal_nocg(meas_args, gal_cg,
                             chr_psf)
     # compute HLR of galaxy with CG & set it as the size of the weight function
@@ -494,7 +494,7 @@ def calc_cg_crg(crg, meas_args,
     g_cg = ring_test_single_gal(meas_args, gal_cg,
                                 chr_psf)
     # print "Ring test on gal with no CG"
-    print " Ring test on gal with NO CG"
+    # print " Ring test on gal with NO CG"
     g_ncg = ring_test_single_gal(meas_args, gal_nocg,
                                  chr_psf)
     return g_cg, g_ncg
