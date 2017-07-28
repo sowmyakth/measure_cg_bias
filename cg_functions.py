@@ -572,3 +572,13 @@ def calc_cg_crg(crg, meas_args,
     g_ncg = ring_test_single_gal(meas_args, gal_nocg,
                                  chr_psf)
     return g_cg, g_ncg
+
+
+def get_bias(gcg, gnocg, gtrue):
+    """Computes multiplicative and additive bias"""
+    fit_cg = np.polyfit(gtrue, gcg, 1)
+    fit_nocg = np.polyfit(gtrue, gnocg, 1)
+    fit_fin = np.polyfit(gtrue, gcg - gnocg, 1)
+    m = [fit_cg[0] - 1, fit_nocg[0] - 1, fit_fin[0]]
+    c = [fit_cg[1], fit_nocg[1], fit_fin[1]]
+    return m, c
