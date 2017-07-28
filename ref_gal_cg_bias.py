@@ -116,16 +116,16 @@ def meas_cg_bias(gal, row, f_name,
     meas_args.bp = filt
     psf_args = cg_fn.psf_params()
     gcg, gnocg = cg_fn.calc_cg_crg(gal, meas_args, psf_args)
-    print " Measured CG bias"
+    print "Computing CG bias"
     if (gcg == "Fail") or (gnocg == "Fail"):
         print "HSM FAILED"
         return
     row[f_type + '_g_cg'] = gcg.T
     row[f_type + '_g_no_cg'] = gnocg.T
-    m, c = cg_fn.get_bias(gcg.T[0], gnocg.T[0], rt_g.T[0])
+    m, c = cg_fn.get_bias(gcg[0], gnocg[0], rt_g.T[0])
     row[f_type + '_m1'] = m
     row[f_type + '_c1'] = c
-    m, c = cg_fn.get_bias(gcg.T[1], gnocg.T[1], rt_g.T[1])
+    m, c = cg_fn.get_bias(gcg[1], gnocg[1], rt_g.T[1])
     row[f_type + '_m2'] = m
     row[f_type + '_c2'] = c
 
@@ -138,13 +138,13 @@ def main(Args):
     if Args.disk_SED_name != 'all':
         dSEDs = [Args.disk_SED_name, ]
     dSED = Args.disk_SED_name
-    redshifts = np.linspace(0., 1.2, 5)
+    redshifts = np.linspace(0., 1.2, 31)
     e_s = [0.3, 0.3]
     filt = Args.filter
     g = np.linspace(0.005, 0.01, 2)
     rt_g = np.array([g, g]).T
     num = len(redshifts)
-    for d, dSED in enumerate(dSEDs):
+    for dSED in dSEDs:
         index_table = get_table(num)
         for z_num, z in enumerate(redshifts):
             print "Creating gal at redshift {0} in {1} band".format(z, filt)
@@ -159,7 +159,8 @@ def main(Args):
             meas_cg_bias(CRG2, index_table[z_num], filt,
                          rt_g, 'CRG_tru')
             # parametric
-            input_p2 = cg_fn.LSST_Args(disk_SED_name=dSED, redshift=z)
+            input_p2 = cg_fn.LSST_Args(disk_SED_name=dSED, redshift=z,
+                                       bulge_e=e_s, disk_e=e_s)
             para_gal = get_lsst_para(input_p2)
             meas_cg_bias(para_gal, index_table[z_num], filt,
                          rt_g, 'para')
