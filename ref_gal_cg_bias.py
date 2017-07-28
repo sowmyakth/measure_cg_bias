@@ -32,7 +32,7 @@ def get_table(num):
              'CRG_tru_m2', 'para_c1', 'CRG_c1', 'CRG_tru_c1', 'para_c2',
              'CRG_c2', 'CRG_tru_c2')
     dtype = ['int'] + ['float'] * 19
-    cols = [range(num), np.zeros(num)] + [np.zeros([num, 2, 2])] * 6 + [np.zeros([num, 3])] * 12
+    cols = [range(num), np.zeros(num)] + [np.ones([num, 2, 2])*-10] * 6 + [np.ones([num, 3])*-10] * 12
     index_table = Table(cols, names=names, dtype=dtype)
     return index_table
 
@@ -110,7 +110,6 @@ def meas_cg_bias(gal, row, f_name,
     @rt_g    shaer applied to the galaxy.
     @type    string to identify the column of row to save measured shear.
     """
-    print " Measuring CG bias"
     filt = galsim.Bandpass('data/baseline/total_%s.dat'%f_name,
                            wave_type='nm').thin(rel_err=1e-4)
     meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix)
@@ -120,8 +119,7 @@ def meas_cg_bias(gal, row, f_name,
     print " Measured CG bias"
     if (gcg == "Fail") or (gnocg == "Fail"):
         print "HSM FAILED"
-        g_f = np.ones([2, len(rt_g)]) * -10
-        gcg, gnocg = g_f, g_f
+        continue
     row[f_type + '_g_cg'] = gcg.T
     row[f_type + '_g_no_cg'] = gnocg.T
     m, c = cg_fn.get_bias(gcg.T[0], gnocg.T[0], rt_g.T[0])
@@ -147,9 +145,10 @@ def main(Args):
     rt_g = np.array([g, g]).T
     num = len(redshifts)
     for d, dSED in enumerate(dSEDs):
+        index_table = get_table(num)
         for z_num, z in enumerate(redshifts):
             print "Creating gal at redshift {0} in {1} band".format(z, filt)
-            index_table = get_table(num)
+            index_table['redshift'][z_num] = z
             input_p1 = cg_fn.Eu_Args(scale=0.03, redshift=z,
                                      bulge_e=e_s, disk_e=e_s,
                                      psf_sig_o=0.071, psf_w_o=806,
@@ -165,9 +164,10 @@ def main(Args):
             meas_cg_bias(para_gal, index_table[z_num], filt,
                          rt_g, 'para')
         op_file = 'results/ref_gal_cg_bias_{0}_dsed_{1}_band.fits'.format(dSED,
-                                                                         filt)
+                                                                          filt)
         index_table.write(op_file, format='fits',
                           overwrite=True)
+        print "Saving output at", op_file
 
 
 if __name__ == "__main__":
