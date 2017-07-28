@@ -119,7 +119,7 @@ def meas_cg_bias(gal, row, f_name,
     print " Measured CG bias"
     if (gcg == "Fail") or (gnocg == "Fail"):
         print "HSM FAILED"
-        continue
+        return
     row[f_type + '_g_cg'] = gcg.T
     row[f_type + '_g_no_cg'] = gnocg.T
     m, c = cg_fn.get_bias(gcg.T[0], gnocg.T[0], rt_g.T[0])
