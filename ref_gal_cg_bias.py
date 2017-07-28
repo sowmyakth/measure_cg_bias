@@ -20,9 +20,9 @@ SBP with polynomial SEDs which is the default setting.
 """
 import galsim
 import numpy as np
-from astropy.table import Table
+from astropy.table import Table, Column
 import cg_functions as cg_fn
-# galsim.ChromaticConvolution.resize_effective_prof_cache(5)
+galsim.ChromaticConvolution.resize_effective_prof_cache(5)
 
 
 def get_table(num):
@@ -98,8 +98,8 @@ def get_lsst_para(in_p):
     return gal
 
 
-def meas_cg_bias(gal, row, f_name,
-                 rt_g, f_type, npix=360):
+def meas_cg_bias(gal, row, meas_args,
+                 psf_args, f_type):
     """Computes bias due to color gradient on sahpe measuremnt.
     For an input chromatic galaxy with cg,  gal an equilvalent galaxy with
     no cg is created and the shear recovered from each (with ring test) is
@@ -110,11 +110,6 @@ def meas_cg_bias(gal, row, f_name,
     @rt_g    shaer applied to the galaxy.
     @type    string to identify the column of row to save measured shear.
     """
-    filt = galsim.Bandpass('data/baseline/total_%s.dat'%f_name,
-                           wave_type='nm').thin(rel_err=1e-4)
-    meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix)
-    meas_args.bp = filt
-    psf_args = cg_fn.psf_params()
     gcg, gnocg = cg_fn.calc_cg_crg(gal, meas_args, psf_args)
     print "Computing CG bias"
     if (gcg == "Fail") or (gnocg == "Fail"):
@@ -122,15 +117,16 @@ def meas_cg_bias(gal, row, f_name,
         return
     row[f_type + '_g_cg'] = gcg.T
     row[f_type + '_g_no_cg'] = gnocg.T
-    m, c = cg_fn.get_bias(gcg[0], gnocg[0], rt_g.T[0])
+    gtrue = meas_args.rt_g
+    m, c = cg_fn.get_bias(gcg[0], gnocg[0], gtrue.T[0])
     row[f_type + '_m1'] = m
     row[f_type + '_c1'] = c
-    m, c = cg_fn.get_bias(gcg[1], gnocg[1], rt_g.T[1])
+    m, c = cg_fn.get_bias(gcg[1], gnocg[1], gtrue.T[1])
     row[f_type + '_m2'] = m
     row[f_type + '_c2'] = c
 
 
-def main(Args):
+def main_variable_dSED(Args):
     """Creates galaxy and psf images with different parametrs
      and measures cg bias"""
     # Set disk SED name
@@ -143,6 +139,7 @@ def main(Args):
     filt = Args.filter
     g = np.linspace(0.005, 0.01, 2)
     rt_g = np.array([g, g]).T
+    npix = 360
     num = len(redshifts)
     for dSED in dSEDs:
         index_table = get_table(num)
@@ -154,21 +151,69 @@ def main(Args):
                                      psf_sig_o=0.071, psf_w_o=806,
                                      disk_SED_name=dSED)
             CRG1, CRG2 = get_CRG(input_p1)
-            meas_cg_bias(CRG1, index_table[z_num], filt,
-                         rt_g, 'CRG')
-            meas_cg_bias(CRG2, index_table[z_num], filt,
-                         rt_g, 'CRG_tru')
-            # parametric
+            # parametric galaxy
             input_p2 = cg_fn.LSST_Args(disk_SED_name=dSED, redshift=z,
                                        bulge_e=e_s, disk_e=e_s)
             para_gal = get_lsst_para(input_p2)
-            meas_cg_bias(para_gal, index_table[z_num], filt,
-                         rt_g, 'para')
+            meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix)
+            meas_args.bp = galsim.Bandpass('data/baseline/total_%s.dat'%filt,
+                                           wave_type='nm').thin(rel_err=1e-4)
+            psf_args = cg_fn.psf_params()
+            meas_cg_bias(CRG1, index_table[z_num], meas_args,
+                         psf_args, 'CRG')
+            meas_cg_bias(CRG2, index_table[z_num], meas_args,
+                         psf_args, 'CRG_tru')
+            meas_cg_bias(para_gal, index_table[z_num], meas_args,
+                         psf_args, 'para')
         op_file = 'results/ref_gal_cg_bias_{0}_dsed_{1}_band.fits'.format(dSED,
                                                                           filt)
         index_table.write(op_file, format='fits',
                           overwrite=True)
         print "Saving output at", op_file
+
+
+def main_variable_PSF(Args):
+    """Creates galaxy and psf images with different parametrs
+     and measures cg bias. Varying LSST  PSF size"""
+    # Set disk SED name
+    e_s = [0.3, 0.3]
+    filt = Args.filter
+    if Args.disk_SED_name == 'all':
+        dSED = 'Im'
+    g = np.linspace(0.005, 0.01, 2)
+    rt_g = np.array([g, g]).T
+    npix = 360
+    p_sigs = np.linspace(0.1, 0.4, 5)
+    num = len(p_sigs)
+    index_table = get_table(num)
+    col = Column(np.ones(num) * -10, name='psf_sigma')
+    index_table.add_column(col)
+    for num, p_sig in enumerate(p_sigs):
+        print "Computing for LSST PSF sigma {0} in {1} band".format(p_sig,
+                                                                    filt)
+        input_p1 = cg_fn.Eu_Args(scale=0.03, disk_SED_name=dSED,
+                                 bulge_e=e_s, disk_e=e_s,
+                                 psf_sig_o=0.071, psf_w_o=806)
+        CRG1, CRG2 = get_CRG(input_p1)
+        # parametric
+        input_p2 = cg_fn.LSST_Args(disk_SED_name=dSED,
+                                   bulge_e=e_s, disk_e=e_s)
+        para_gal = get_lsst_para(input_p2)
+        meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix)
+        meas_args.bp = galsim.Bandpass('data/baseline/total_%s.dat'%filt,
+                                       wave_type='nm').thin(rel_err=1e-4)
+        psf_args = cg_fn.psf_params(sigma_o=p_sig)
+        meas_cg_bias(CRG1, index_table[num], meas_args,
+                     psf_args, 'CRG')
+        meas_cg_bias(CRG2, index_table[num], meas_args,
+                     psf_args, 'CRG_tru')
+        meas_cg_bias(para_gal, index_table[num], meas_args,
+                     psf_args, 'para')
+        index_table['psf_sigma'] = p_sig
+    op_file = 'results/ref_gal_cg_bias_var_psig_{0}_band.fits'.format(filt)
+    index_table.write(op_file, format='fits',
+                      overwrite=True)
+    print "Saving output at", op_file
 
 
 if __name__ == "__main__":
@@ -179,4 +224,5 @@ if __name__ == "__main__":
     parser.add_argument('--filter', default='r',
                         help="Filter to run cg analysis in [Default:r]")
     args = parser.parse_args()
-    main(args)
+    main_variable_dSED(args)
+    main_variable_PSF(args)
