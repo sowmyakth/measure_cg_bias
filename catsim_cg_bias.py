@@ -17,7 +17,6 @@ full depth HST image(r).
 """
 import galsim
 import extinction
-import os
 import numpy as np
 from astropy.table import Table, Column
 import cg_functions as cg_fn
