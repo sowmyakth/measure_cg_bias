@@ -59,8 +59,8 @@ def get_HST_im(con):
     i_exptime = 1  # 2100
     nx, ny = 360, 360   # number of x and y pixels
     # get bandpass
-    V_band = cg_fn.get_HST_Bandpass('F606W')
-    I_band = cg_fn.get_HST_Bandpass('F814W')
+    V_band = cg_fn.get_HST_Bandpass('F606W').thin(rel_err=1e-4)
+    I_band = cg_fn.get_HST_Bandpass('F814W').thin(rel_err=1e-4)
     # draw image
     gal_im_v = con.drawImage(V_band, nx=nx, ny=ny, scale=scale,
                              area=area, exptime=v_exptime)
@@ -172,8 +172,6 @@ def main(Args):
     # Set disk SED name
     e_s = [0.3, 0.3]
     filt = Args.filter
-    if Args.disk_SED_name == 'all':
-        dSED = 'Im'
     g = np.linspace(0.005, 0.01, 2)
     rt_g = np.array([g, g]).T
     npix = 360
@@ -200,8 +198,10 @@ def main(Args):
         psf_args = cg_fn.psf_params()
         meas_cg_bias(CRG1, index_table[n], meas_args,
                      psf_args, 'CRG')
-    op_file = 'results/ref_gal_cg_bias_{0}_band_var_noise_{1}.fits'.format(filt,
-                                                                           Args.file_num)
+    path = 'results/'
+    path = "/nfs/slac/g/ki/ki19/deuce/AEGIS/cg_results/ref_gal_results/with_aeg_noise_all/"
+    op_file = path + 'ref_gal_cg_bias_{0}_band_var_noise_{1}.fits'.format(filt,
+                                                                          Args.file_num)
     index_table.write(op_file, format='fits',
                       overwrite=True)
     print "Saving output at", op_file
@@ -210,8 +210,8 @@ def main(Args):
 if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('--disk_SED_name', default='all',
-                        help="run for only one disk SED.[Default:all]")
+    parser.add_argument('--disk_SED_name', default='Im',
+                        help="disk SED one of E, Im, Sbc, Scd.[Default:Im]")
     parser.add_argument('--filter', default='r',
                         help="Filter to run cg analysis in [Default:r]")
     parser.add_argument('--size', default='10',
