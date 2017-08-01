@@ -50,11 +50,6 @@ def get_CRG(in_p):
     as input to CRG.
     """
     #  HST scale
-    scale = 0.03
-    area = 4.437 * 10000  # np.pi * (2.4 * 100 / 2.)**2
-    v_exptime = 1  # 2260
-    i_exptime = 1  # 2100
-    nx, ny = 360, 360   # number of x and y pixels
     in_p.b_SED, in_p.d_SED, in_p.c_SED = cg_fn.get_template_seds(in_p)
     PSF = cg_fn.get_gaussian_PSF(in_p)
     gal = cg_fn.get_gal_cg(in_p)
@@ -62,10 +57,6 @@ def get_CRG(in_p):
     # get bandpass
     V_band = cg_fn.get_HST_Bandpass('F606W')
     I_band = cg_fn.get_HST_Bandpass('F814W')
-    gal_im_v = con.drawImage(V_band, nx=nx, ny=ny, scale=scale,
-                             area=area, exptime=v_exptime)
-    gal_im_i = con.drawImage(I_band, nx=nx, ny=ny, scale=scale,
-                             area=area, exptime=i_exptime)
     xi_v = galsim.getCOSMOSNoise(file_name='data/acs_V_unrot_sci_cf.fits',
                                  variance=1e-39)
     xi_i = galsim.getCOSMOSNoise(file_name='data/acs_I_unrot_sci_cf.fits',
@@ -146,6 +137,7 @@ def main_variable_dSED(Args):
         for z_num, z in enumerate(redshifts):
             print "Creating gal at redshift {0} in {1} band".format(z, filt)
             index_table['redshift'][z_num] = z
+            index_table['NUMBER'][z_num] = z_num
             input_p1 = cg_fn.Eu_Args(scale=0.03, redshift=z,
                                      bulge_e=e_s, disk_e=e_s,
                                      psf_sig_o=0.071, psf_w_o=806,
@@ -183,7 +175,7 @@ def main_variable_PSF(Args):
     g = np.linspace(0.005, 0.01, 2)
     rt_g = np.array([g, g]).T
     npix = 360
-    p_sigs = np.linspace(0.1, 0.4, 5)
+    p_sigs = np.linspace(0.1, 0.6, 8)
     num = len(p_sigs)
     index_table = get_table(num)
     col = Column(np.ones(num) * -10, name='psf_sigma')
@@ -191,14 +183,17 @@ def main_variable_PSF(Args):
     for num, p_sig in enumerate(p_sigs):
         print "Computing for LSST PSF sigma {0} in {1} band".format(p_sig,
                                                                     filt)
+        index_table['NUMBER'][num] = num
         input_p1 = cg_fn.Eu_Args(scale=0.03, disk_SED_name=dSED,
                                  bulge_e=e_s, disk_e=e_s,
                                  psf_sig_o=0.071, psf_w_o=806)
+        index_table['redshift'][num] = input_p1.redshift
         CRG1, CRG2 = get_CRG(input_p1)
         # parametric
         input_p2 = cg_fn.LSST_Args(disk_SED_name=dSED,
                                    bulge_e=e_s, disk_e=e_s)
         para_gal = get_lsst_para(input_p2)
+        # Compute CG bias
         meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix)
         meas_args.bp = galsim.Bandpass('data/baseline/total_%s.dat'%filt,
                                        wave_type='nm').thin(rel_err=1e-4)
@@ -209,7 +204,7 @@ def main_variable_PSF(Args):
                      psf_args, 'CRG_tru')
         meas_cg_bias(para_gal, index_table[num], meas_args,
                      psf_args, 'para')
-        index_table['psf_sigma'] = p_sig
+        index_table['psf_sigma'][num] = p_sig
     op_file = 'results/ref_gal_cg_bias_var_psig_{0}_band.fits'.format(filt)
     index_table.write(op_file, format='fits',
                       overwrite=True)
