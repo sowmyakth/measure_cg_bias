@@ -2,7 +2,7 @@
 import galsim
 import numpy as np
 import cg_functions as cg_fn
-galsim.ChromaticConvolution.resize_effective_prof_cache(5)
+# galsim.ChromaticConvolution.resize_effective_prof_cache(5)
 
 
 def no_bulge():
@@ -23,7 +23,7 @@ def no_bulge():
 
 def no_disk():
     """No disk, cg bias must be zero"""
-    bfrac = 0.999999999999
+    bfrac = 0.999999
     in_p = cg_fn.LSST_Args(bulge_frac=bfrac)
     filt = galsim.Bandpass('data/baseline/total_r.dat',
                            wave_type='nm').thin(rel_err=1e-4)
@@ -81,6 +81,10 @@ def with_cg():
     np.testing.assert_raises(AssertionError,
                              np.testing.assert_array_almost_equal,
                              (gcg / gnocg - 1).T[0], [0, 0], decimal=5)
+    # Previously measured value at default galaxy parameters
+    np.testing.assert_array_almost_equal((gcg / gnocg - 1).T[0],
+                                         [0.00106263, 0.00106594],
+                                         decimal=5)
 
 
 if __name__ == "__main__":
