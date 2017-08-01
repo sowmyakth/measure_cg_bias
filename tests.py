@@ -68,7 +68,7 @@ def same_sed():
 
 
 def achr_psf():
-    """LSST PSF is made achromatic, CG bias must be 0"""
+    """LSST PSF is chromatic, CG bias must be 0"""
     in_p = cg_fn.LSST_Args()
     filt = galsim.Bandpass('data/baseline/total_r.dat',
                            wave_type='nm').thin(rel_err=1e-4)
@@ -161,10 +161,10 @@ def with_CRG():
 
 
 if __name__ == "__main__":
-    #no_bulge()
-    #no_disk()
-    #same_bulge_disk()
-    #same_sed()
+    no_bulge()
+    no_disk()
+    same_bulge_disk()
+    same_sed()
     achr_psf()
     with_cg()
     with_CRG()
