@@ -197,7 +197,6 @@ def get_template_seds(Args):
     return b_SED, d_SED, c_SED
 
 
-
 def get_HST_Bandpass(band):
     """Returns a Bandpass object for the catalog.
     Using similar code from real.py in Galsim
