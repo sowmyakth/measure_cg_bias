@@ -579,3 +579,51 @@ def get_bias(gcg, gnocg, gtrue):
     m = [fit_cg[0] - 1, fit_nocg[0] - 1, fit_fin[0]]
     c = [fit_cg[1], fit_nocg[1], fit_fin[1]]
     return m, c
+
+
+def get_CRG_basic(gal, in_p, true_SED=True,
+                  noise_variance=[1e-39, 1e-39]):
+    """Comptes CRG for input galaxy.
+    @param
+    gal        galsim object of the galaxy to create CRG.
+    in_p       Input parametrs used to draw galaxy. This must contain
+               the bulge, disk and composite SEDs.
+    tru_SED    If true then also return CRG with true SED as input
+    noise_variance    variance of HST noise to be added to the CRG
+                      input galaxy image in V and I bands
+    """
+    hst_param = Eu_Args(scale=0.03, psf_sig_o=0.071,
+                        psf_w_o=806)
+    PSF = get_gaussian_PSF(hst_param)
+    con = galsim.Convolve([gal, PSF])
+    # get bandpass
+    V_band = get_HST_Bandpass('F606W')
+    I_band = get_HST_Bandpass('F814W')
+    xi_v = galsim.getCOSMOSNoise(file_name='data/acs_V_unrot_sci_cf.fits',
+                                 variance=noise_variance[0])
+    xi_i = galsim.getCOSMOSNoise(file_name='data/acs_I_unrot_sci_cf.fits',
+                                 variance=noise_variance[1])
+    psf_v = get_eff_psf(PSF, in_p.c_SED, V_band)
+    psf_i = get_eff_psf(PSF, in_p.c_SED, I_band)
+    eff_PSFs = [psf_v, psf_i]
+    gal_im_v = con.drawImage(V_band, nx=350, ny=350, scale=0.03)
+    gal_im_i = con.drawImage(I_band, nx=350, ny=350, scale=0.03)
+    gal_im_v.addNoise(xi_v)
+    gal_im_i.addNoise(xi_i)
+    #  Polynomial SEDs
+    images = [gal_im_v, gal_im_i]
+    bands = [V_band, I_band]
+    crg1 = galsim.ChromaticRealGalaxy.makeFromImages(images=images,
+                                                     bands=bands,
+                                                     xis=[xi_v, xi_i],
+                                                     PSFs=eff_PSFs)
+    if true_SED:
+        seds = [in_p.b_SED, in_p.d_SED]
+        crg2 = galsim.ChromaticRealGalaxy.makeFromImages(images=images,
+                                                         bands=bands,
+                                                         xis=[xi_v, xi_i],
+                                                         PSFs=eff_PSFs,
+                                                         SEDs=seds)
+        return crg1, crg2
+    else:
+        return crg1
