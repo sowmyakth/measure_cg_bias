@@ -168,7 +168,7 @@ def get_CRG(cat, rng, row):
     # get bandpass
     V = cg_fn.get_HST_Bandpass('F606W')
     I = cg_fn.get_HST_Bandpass('F814W')
-    c_sed = seds[0] + seds[1]
+    c_sed = gal.SED
     temp_d = seds[1] * cat['fluxnorm_disk']
     temp_b = seds[0] * cat['fluxnorm_bulge']
     b_sed_mag = [temp_b.calculateMagnitude(V), temp_b.calculateMagnitude(I)]
