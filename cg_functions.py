@@ -582,7 +582,7 @@ def get_bias(gcg, gnocg, gtrue):
 
 
 def get_CRG_basic(gal, in_p, true_SED=True,
-                  noise_variance=[1e-39, 1e-39]):
+                  noise_variance=np.array([1e-39, 1e-39])):
     """Comptes CRG for input galaxy.
     @param
     gal        galsim object of the galaxy to create CRG.
