@@ -211,6 +211,55 @@ def main_variable_PSF(Args):
     print "Saving output at", op_file
 
 
+def main_variable_PSF_alpha(Args):
+    """Creates galaxy and psf images with different parametrs
+     and measures cg bias. Varying LSST  PSF wavelength dependent
+     size exponent alpha
+     """
+    # Set disk SED name
+    e_s = [0.3, 0.3]
+    filt = Args.filter
+    if Args.disk_SED_name == 'all':
+        dSED = 'Im'
+    g = np.linspace(0.005, 0.01, 2)
+    rt_g = np.array([g, g]).T
+    npix = 360
+    alphas = np.linspace(-1, 1, 8)
+    num = len(alphas)
+    index_table = get_table(num)
+    col = Column(np.ones(num) * -10, name='alpha')
+    index_table.add_column(col)
+    for num, alpha in enumerate(alphas):
+        print "Computing for LSST PSF alpha {0} in {1} band".format(alpha,
+                                                                    filt)
+        index_table['NUMBER'][num] = num
+        index_table['alpha'][num] = alpha
+        input_p1 = cg_fn.Eu_Args(scale=0.03, disk_SED_name=dSED,
+                                 bulge_e=e_s, disk_e=e_s,
+                                 psf_sig_o=0.071, psf_w_o=806)
+        index_table['redshift'][num] = input_p1.redshift
+        CRG1, CRG2 = get_CRG(input_p1)
+        # parametric
+        input_p2 = cg_fn.LSST_Args(disk_SED_name=dSED,
+                                   bulge_e=e_s, disk_e=e_s)
+        para_gal = get_lsst_para(input_p2)
+        # Compute CG bias
+        meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix)
+        meas_args.bp = galsim.Bandpass('data/baseline/total_%s.dat'%filt,
+                                       wave_type='nm').thin(rel_err=1e-4)
+        psf_args = cg_fn.psf_params(alpha=alpha)
+        meas_cg_bias(CRG1, index_table[num], meas_args,
+                     psf_args, 'CRG')
+        meas_cg_bias(CRG2, index_table[num], meas_args,
+                     psf_args, 'CRG_tru')
+        meas_cg_bias(para_gal, index_table[num], meas_args,
+                     psf_args, 'para')
+    op_file = 'results/ref_gal_cg_bias_var_alpha_{0}_band.fits'.format(filt)
+    index_table.write(op_file, format='fits',
+                      overwrite=True)
+    print "Saving output at", op_file
+
+
 if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -219,5 +268,6 @@ if __name__ == "__main__":
     parser.add_argument('--filter', default='r',
                         help="Filter to run cg analysis in [Default:r]")
     args = parser.parse_args()
-    main_variable_dSED(args)
-    main_variable_PSF(args)
+    # main_variable_dSED(args)
+    # main_variable_PSF(args)
+    main_variable_PSF_alpha(args)
