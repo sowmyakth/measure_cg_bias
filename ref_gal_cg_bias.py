@@ -260,6 +260,105 @@ def main_variable_PSF_alpha(Args):
     print "Saving output at", op_file
 
 
+def main_variable_weight(Args):
+    """Creates galaxy and psf images with different parametrs
+     and measures cg bias. Varying LSST  PSF wavelength dependent
+     size exponent alpha. CG bias is estimated with KSB method
+     """
+    # Set disk SED name
+    e_s = [0.3, 0.3]
+    filt = Args.filter
+    if Args.disk_SED_name == 'all':
+        dSED = 'Im'
+    g = np.linspace(0.005, 0.01, 2)
+    rt_g = np.array([g, g]).T
+    npix = 360
+    weights = np.linspace(0.4, 1.6, 11)
+    num = len(weights)
+    index_table = get_table(num)
+    col = Column(np.ones(num) * -10, name='weight_sigma')
+    index_table.add_column(col)
+    for num, weight in enumerate(weights):
+        print "Computing for LSST weight sigma {0} in {1} band".format(weight,
+                                                                       filt)
+        index_table['NUMBER'][num] = num
+        index_table['weight_sigma'][num] = weight
+        input_p1 = cg_fn.Eu_Args(scale=0.03, disk_SED_name=dSED,
+                                 bulge_e=e_s, disk_e=e_s,
+                                 psf_sig_o=0.071, psf_w_o=806)
+        index_table['redshift'][num] = input_p1.redshift
+        CRG1, CRG2 = get_CRG(input_p1)
+        # parametric
+        input_p2 = cg_fn.LSST_Args(disk_SED_name=dSED,
+                                   bulge_e=e_s, disk_e=e_s)
+        para_gal = get_lsst_para(input_p2)
+        # Compute CG bias
+        meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix,
+                                    sig_w=weight, shear_est='KSB')
+        meas_args.bp = galsim.Bandpass('data/baseline/total_%s.dat'%filt,
+                                       wave_type='nm').thin(rel_err=1e-4)
+        psf_args = cg_fn.psf_params()
+        meas_cg_bias(CRG1, index_table[num], meas_args,
+                     psf_args, 'CRG')
+        meas_cg_bias(CRG2, index_table[num], meas_args,
+                     psf_args, 'CRG_tru')
+        meas_cg_bias(para_gal, index_table[num], meas_args,
+                     psf_args, 'para')
+    op_file = 'results/ref_gal_cg_bias_var_weight_{0}_band.fits'.format(filt)
+    index_table.write(op_file, format='fits',
+                      overwrite=True)
+    print "Saving output at", op_file
+
+
+def main_variable_shear_est(Args):
+    """Measure CG bias with different shape measurement methods
+    in galsim.hsm"""
+    # Set disk SED name
+    methods = ['REGAUSS', 'KSB', 'LINEAR', 'BJ']
+    if Args.disk_SED_name == 'all':
+        dSED = 'Im'
+    else:
+        dSED = Args.disk_SED_name
+    redshifts = np.linspace(0., 1.2, 11)
+    e_s = [0.3, 0.3]
+    filt = Args.filter
+    g = np.linspace(0.005, 0.01, 2)
+    rt_g = np.array([g, g]).T
+    npix = 360
+    num = len(redshifts)
+    for method in methods:
+        index_table = get_table(num)
+        for z_num, z in enumerate(redshifts):
+            print "Creating gal at redshift {0} in {1} band".format(z, filt)
+            index_table['redshift'][z_num] = z
+            index_table['NUMBER'][z_num] = z_num
+            input_p1 = cg_fn.Eu_Args(scale=0.03, redshift=z,
+                                     bulge_e=e_s, disk_e=e_s,
+                                     psf_sig_o=0.071, psf_w_o=806,
+                                     disk_SED_name=dSED)
+            CRG1, CRG2 = get_CRG(input_p1)
+            # parametric galaxy
+            input_p2 = cg_fn.LSST_Args(disk_SED_name=dSED, redshift=z,
+                                       bulge_e=e_s, disk_e=e_s)
+            para_gal = get_lsst_para(input_p2)
+            meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix,
+                                        shear_est=method)
+            meas_args.bp = galsim.Bandpass('data/baseline/total_%s.dat'%filt,
+                                           wave_type='nm').thin(rel_err=1e-4)
+            psf_args = cg_fn.psf_params()
+            meas_cg_bias(CRG1, index_table[z_num], meas_args,
+                         psf_args, 'CRG')
+            meas_cg_bias(CRG2, index_table[z_num], meas_args,
+                         psf_args, 'CRG_tru')
+            meas_cg_bias(para_gal, index_table[z_num], meas_args,
+                         psf_args, 'para')
+        op_file = 'results/ref_gal_cg_bias_{0}_{1}_band.fits'.format(method,
+                                                                     filt)
+        index_table.write(op_file, format='fits',
+                          overwrite=True)
+        print "Saving output at", op_file
+
+
 if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -270,4 +369,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # main_variable_dSED(args)
     # main_variable_PSF(args)
-    main_variable_PSF_alpha(args)
+    # main_variable_PSF_alpha(args)
+    # main_variable_weight(args)
+    main_variable_shear_est(args)
