@@ -31,10 +31,10 @@ def get_rand_SNR(size):
     path = '/nfs/slac/g/ki/ki19/deuce/AEGIS/AEGIS_catalog_full/'
     name = 'complete_AEGIS_galaxy_catalog_filter_25.2.fits'
     selec_cat = {}
-    for f, filt in enumerate(filters):
+    for f in range(len(filters)):
         selec_name = name.replace('filter', file_filter_name[f])
         selec_cat[f] = Table.read(path + selec_name, format='fits')
-    indices = np.random.randint(len(selec_cat[f]), size=size)
+    indices = np.random.randint(len(selec_cat[0]), size=size)
     V_SNR = selec_cat[0]['sn_ellip_gauss'][indices]
     I_SNR = selec_cat[1]['sn_ellip_gauss'][indices]
     SNRs = np.array([V_SNR, I_SNR]).T
@@ -182,9 +182,10 @@ def main(Args):
     indexs = range(int(Args.file_num) * num, (int(Args.file_num) + 1) * num)
     col = Column(np.ones(num) * -10, name='psf_sigma')
     index_table.add_column(col)
+    dSED = Args.disk_SED_name
     for n in range(num):
         print "Computing for noise realization {0} in {1} band".format(n,
-                                                                      filt)
+                                                                       filt)
         index_table['NUMBER'][n] = indexs[n]
         input_p = cg_fn.Eu_Args(scale=0.03, disk_SED_name=dSED,
                                 bulge_e=e_s, disk_e=e_s,
