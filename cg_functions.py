@@ -186,7 +186,7 @@ def get_template_seds(Args):
         Args.bulge_frac        Fraction of flux in bulge at 550 nm rest-frame.
     @returns  bulge SED, disk SED, composite SED.
     """
-    path = 'data/'
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data/')
     b_SED = galsim.SED(path + "CWW_{}_ext.sed".format(Args.bulge_SED_name),
                        wave_type='Ang', flux_type='flambda').thin(rel_err=1e-4)
     d_SED = galsim.SED(path + "CWW_{}_ext.sed".format(Args.disk_SED_name),
@@ -599,9 +599,10 @@ def get_CRG_basic(gal, in_p, true_SED=True,
     # get bandpass
     V_band = get_HST_Bandpass('F606W')
     I_band = get_HST_Bandpass('F814W')
-    xi_v = galsim.getCOSMOSNoise(file_name='data/acs_V_unrot_sci_cf.fits',
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data/')
+    xi_v = galsim.getCOSMOSNoise(file_name=path + 'acs_V_unrot_sci_cf.fits',
                                  variance=noise_variance[0])
-    xi_i = galsim.getCOSMOSNoise(file_name='data/acs_I_unrot_sci_cf.fits',
+    xi_i = galsim.getCOSMOSNoise(file_name=path + 'acs_I_unrot_sci_cf.fits',
                                  variance=noise_variance[1])
     psf_v = get_eff_psf(PSF, in_p.c_SED, V_band)
     psf_i = get_eff_psf(PSF, in_p.c_SED, I_band)
