@@ -40,14 +40,15 @@ class meas_args(object):
     """
     def __init__(self, npix=360, scale=0.2,
                  shear_est='REGAUSS', n_ring=3,
-                 rt_g=np.array([[0.01, 0.01]]), filter_name='r'):
+                 rt_g=np.array([[0.01, 0.01]]), filter_name='r',
+                 sig_w=None):
         self.npix = npix
         self.scale = scale
         self.shear_est = shear_est
         self.n_ring = n_ring
         self.filter_name = filter_name
         self.rt_g = rt_g
-        self.sig_w = 0.
+        self.sig_w = sig_w
         self.c_SED = None
         self.bp = None
 
