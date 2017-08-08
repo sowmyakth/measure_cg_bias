@@ -24,8 +24,6 @@ def get_rand_gal(params):
     # Dont pick too large galaxies
     cond4 = (cat['DiskHalfLightRadius'] < 3) & (cat['BulgeHalfLightRadius'] < 3)
     q, =  np.where(cond1 & cond2 & cond3 & cond4)
-    indices = range(int(params.num) * int(params.size),
-                    (int(params.num) + 1) * int(params.size))
     new_cat = cat[q[int(params.indx)]]
     return new_cat
 
