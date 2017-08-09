@@ -535,22 +535,11 @@ def get_rad_sum(image, ro, xo, yo):
 def calc_cg_crg(crg, meas_args,
                 psf_args, calc_weight=False):
     """Compute shape of galaxy with CG and galaxy with no CG
-    @param Args         Class with the following attributes:
-        Args.telescope  Telescope the CG bias of which is to be meaasured
-                        (Euclid or LSST)
-        Args.bp         GalSim Bandpass describing filter.
-        Args.b_SED      SED of bulge.
-        Args.d_SED      SED of disk.
-        Args.c_SED      Flux weighted composite SED.
-        Args.scale      Pixel scale of postage stamp image.
-        Args.n_ring     Number of intrinsic ellipticity pairs around ring.
-        Args.shear_est  Method to use to estimate shape.  See `estimate_shape`
-                        docstring.
-        Args.sig_w      For S13 method, the width (sigma) of the Gaussian
-                        weight funcion.
+    @param crg          galsim chromatic object for galaxy with CG
+    @param meas_args    class conatining parametrs used in CG bias measurement
     @param cal_weight   if True, manually computes size of galaxy and sets it
                         as weight size
-    @return  Shape of galaxy with CG, shape of galaxy with no CG ."""
+    @return  shear computed from galaxy with CG and galaxy with no CG ."""
     chr_psf = get_gaussian_PSF(psf_args)
     gal_cg = crg
     meas_args.c_SED = crg.SED
@@ -629,3 +618,32 @@ def get_CRG_basic(gal, in_p, true_SED=True,
         return crg1, crg2
     else:
         return crg1
+
+
+def calc_cg_basic(gal_cg, chr_psf, meas_args,
+                calc_weight=False):
+    """calc_cg_crg() modified to be more general
+    Compute shape of galaxy with CG and galaxy with no CG
+    @param gal_cg          galsim chromatic object for galaxy with CG.
+    @param chr_psf      galsim object for PSF.
+    @param meas_args    class conatining parametrs used in CG bias measurement
+    @param cal_weight   if True, manually computes size of galaxy and sets it
+                        as weight size
+    @return  shear computed from galaxy with CG and galaxy with no CG ."""
+    meas_args.c_SED = crg.SED
+    # print " Get gal with no CG"
+    gal_nocg = get_gal_nocg(meas_args, gal_cg,
+                            chr_psf)
+    # compute HLR of galaxy with CG & set it as the size of the weight function
+    if calc_weight is True:
+        con_cg = (galsim.Convolve(gal_cg, chr_psf))
+        im1 = con_cg.drawImage(meas_args.bp, nx=meas_args.npix,
+                               ny=meas_args.npix, scale=meas_args.scale)
+        meas_args.sig_w = (getHLR(im1.array) * meas_args.scale)
+        print 'Sigma of weight fn:', meas_args.sig_w
+    # print " Ring test on gal with cg"
+    g_cg = ring_test_single_gal(meas_args, gal_cg,
+                                chr_psf)
+    g_ncg = ring_test_single_gal(meas_args, gal_nocg,
+                                 chr_psf)
+    return g_cg, g_ncg
