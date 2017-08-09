@@ -373,7 +373,7 @@ def meas_cg_bias_basic(gal, psf, meas_args,
     @rt_g    shaer applied to the galaxy.
     @type    string to identify the column of row to save measured shear.
     """
-    gcg, gnocg = cg_fn.calc_cg_basic(gal, meas_args, psf)
+    gcg, gnocg = cg_fn.calc_cg_basic(gal, psf, meas_args)
     print "Computing CG bias"
     if (gcg == "Fail") or (gnocg == "Fail"):
         print "HSM FAILED"
