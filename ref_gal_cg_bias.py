@@ -359,6 +359,87 @@ def main_variable_shear_est(Args):
         print "Saving output at", op_file
 
 
+def meas_cg_bias_basic(gal, psf, meas_args,
+                       row, f_type):
+    """Modified meas_cg_bias to be more general
+    Computes bias due to color gradient on sahpe measuremnt.
+    For an input chromatic galaxy with cg,  gal an equilvalent galaxy with
+    no cg is created and the shear recovered from each (with ring test) is
+    measured.
+    @gal     input galaxy with cg.
+    @psf     chromatic psf that the galaxy is observed with.
+    @row     astropy table row to save measured shear.
+    @f_name  name of filter to measure cg bias in
+    @rt_g    shaer applied to the galaxy.
+    @type    string to identify the column of row to save measured shear.
+    """
+    gcg, gnocg = cg_fn.calc_cg_basic(gal, meas_args, psf)
+    print "Computing CG bias"
+    if (gcg == "Fail") or (gnocg == "Fail"):
+        print "HSM FAILED"
+        return
+    row[f_type + '_g_cg'] = gcg.T
+    row[f_type + '_g_no_cg'] = gnocg.T
+    gtrue = meas_args.rt_g
+    m, c = cg_fn.get_bias(gcg[0], gnocg[0], gtrue.T[0])
+    row[f_type + '_m1'] = m
+    row[f_type + '_c1'] = c
+    m, c = cg_fn.get_bias(gcg[1], gnocg[1], gtrue.T[1])
+    row[f_type + '_m2'] = m
+    row[f_type + '_c2'] = c
+
+
+def main_PSF_atmos(Args):
+    """Computes CG bias for reference galaxy with Chromatic Atmosphere
+    PSF for different zenit angles"""
+    # Set disk SED name
+    e_s = [0.3, 0.3]
+    filt = Args.filter
+    if Args.disk_SED_name == 'all':
+        dSED = 'Im'
+    else:
+        dSED = Args.disk_SED_name
+    g = np.linspace(0.005, 0.01, 2)
+    rt_g = np.array([g, g]).T
+    npix = 360
+    angles = np.linspace(0, 45, 5)
+    num = len(angles)
+    index_table = get_table(num)
+    col = Column(np.ones(num) * -10, name='zenith_angle')
+    index_table.add_column(col)
+    for num, angle in enumerate(angles):
+        print "Computing for zenith angle {0} in {1} band".format(angle,
+                                                                  filt)
+        index_table['NUMBER'][num] = num
+        input_p1 = cg_fn.Eu_Args(scale=0.03, disk_SED_name=dSED,
+                                 bulge_e=e_s, disk_e=e_s,
+                                 psf_sig_o=0.071, psf_w_o=806)
+        index_table['redshift'][num] = input_p1.redshift
+        CRG1, CRG2 = get_CRG(input_p1)
+        # parametric
+        input_p2 = cg_fn.LSST_Args(disk_SED_name=dSED,
+                                   bulge_e=e_s, disk_e=e_s)
+        para_gal = get_lsst_para(input_p2)
+        # Compute CG bias
+        meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix)
+        meas_args.bp = galsim.Bandpass('data/baseline/total_%s.dat'%filt,
+                                       wave_type='nm').thin(rel_err=1e-4)
+        psf_args = cg_fn.psf_params()
+        chr_psf = cg_fn.get_Atmos_PSF(psf_args, angle)
+        meas_cg_bias_basic(CRG1, chr_psf, meas_args,
+                           index_table[num], 'CRG')
+        meas_cg_bias_basic(CRG2, chr_psf, meas_args,
+                           index_table[num], 'CRG_tru')
+        meas_cg_bias_basic(para_gal, chr_psf, meas_args,
+                           index_table[num], 'para')
+        index_table['zenithangle'][num] = angle
+    op_file = 'results/ref_gal_cg_bias_var_psig_{0}_band.fits'.format(filt)
+    index_table.write(op_file, format='fits',
+                      overwrite=True)
+    print "Saving output at", op_file
+
+
+
 if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -371,4 +452,5 @@ if __name__ == "__main__":
     # main_variable_PSF(args)
     # main_variable_PSF_alpha(args)
     # main_variable_weight(args)
-    main_variable_shear_est(args)
+    # main_variable_shear_est(args)
+    main_PSF_atmos(args)
