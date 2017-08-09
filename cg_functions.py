@@ -268,6 +268,24 @@ def get_gaussian_PSF(Args):
     return chr_PSF
 
 
+def get_Atmos_PSF(Args, angle):
+    """ Return a chromatic atmsospheric PSF. Size of PSF is wavelength dependent.
+    @param           Class with the following attributes:
+        sigma_o      Gaussian sigma of PSF at known wavelength Args.psf_w_o.
+        w_o          Wavelength at which PSF size is known (nm).
+        alpha        PSF wavelength scaling exponent.  1.0 for diffraction
+                           limit, -0.2 for Kolmogorov turbulence.
+    @param angle     angle from object to zenith, expressed in degrees.
+    @returns chromatic PSF.
+    """
+    mono_PSF = galsim.Gaussian(sigma=Args.psf_sigma_o)
+    chr_PSF = galsim.ChromaticAtmosphere(mono_PSF,
+                                         base_wavelength=Args.psf_w_o,
+                                         alpha=Args.alpha,
+                                         zenith_angle=angle * galsim.degrees)
+    return chr_PSF
+
+
 def get_gal_nocg(Args, gal_cg,
                  chr_PSF):
     """ Construct a galaxy SBP with no CG that yields the same PSF convolved
