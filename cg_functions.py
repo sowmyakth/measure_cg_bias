@@ -639,7 +639,7 @@ def get_CRG_basic(gal, in_p, true_SED=True,
 
 
 def calc_cg_basic(gal_cg, chr_psf, meas_args,
-                calc_weight=False):
+                  calc_weight=False):
     """calc_cg_crg() modified to be more general
     Compute shape of galaxy with CG and galaxy with no CG
     @param gal_cg          galsim chromatic object for galaxy with CG.
@@ -648,7 +648,7 @@ def calc_cg_basic(gal_cg, chr_psf, meas_args,
     @param cal_weight   if True, manually computes size of galaxy and sets it
                         as weight size
     @return  shear computed from galaxy with CG and galaxy with no CG ."""
-    meas_args.c_SED = crg.SED
+    meas_args.c_SED = gal_cg.SED
     # print " Get gal with no CG"
     gal_nocg = get_gal_nocg(meas_args, gal_cg,
                             chr_psf)
