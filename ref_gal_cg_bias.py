@@ -432,7 +432,7 @@ def main_PSF_atmos(Args):
                            index_table[num], 'CRG_tru')
         meas_cg_bias_basic(para_gal, chr_psf, meas_args,
                            index_table[num], 'para')
-        index_table['zenithangle'][num] = angle
+        index_table['zenith_angle'][num] = angle
     op_file = 'results/ref_gal_cg_bias_var_psig_{0}_band.fits'.format(filt)
     index_table.write(op_file, format='fits',
                       overwrite=True)
