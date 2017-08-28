@@ -7,9 +7,9 @@ CG bias is measure for
 3. HST V/I band images from AEGIS 
 
 
-notebooks directory contains ipython notebook contains plots showing results
+notebooks directory contains ipython notebooks containing plots showing results
 from analysis and can be used to visulaize the galaxies and PSFs used in the 
 analysis.
 
-data directiory contains template SEDs, LSST filters and HST noise
-correlation functions used in analysis
+data directory contains template SEDs, LSST filter response curves, and HST noise
+correlation functions used in the analysis.
