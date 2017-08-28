@@ -1,18 +1,18 @@
 [![Code Health](https://landscape.io/github/sowmyakth/measure_cg_bias/master/landscape.svg?style=flat)](https://landscape.io/github/sowmyakth/measure_cg_bias/master)
 # measure_cg_bias
 Code to measure bias from galaxy color gradients in weak lensing measurements.
-CG bias is measure for 
+CG bias is estimated for 
 1. reference parametric galaxy with bulge and disk
-2. Galaxies from Catsim
+2. Galaxies from CatSim
 3. HST V/I band images from AEGIS 
 
 
-notebooks directory contains ipython notebooks containing plots showing results
+/notebooks directory contains jupyter notebooks containing plots showing results
 from analysis and can be used to visulaize the galaxies and PSFs used in the 
 analysis.
 
-data directory contains template SEDs, LSST filter response curves, and HST noise
+/data directory contains template SEDs, LSST filter response curves, and HST noise
 correlation functions used in the analysis.
 
-Overleaf file(in progress) summarizing measurement techniques and results can be found
+Overleaf file (work in progress) describing measurement techniques and results can be found
 [here](https://www.overleaf.com/read/wqztwvtnxhvn).
