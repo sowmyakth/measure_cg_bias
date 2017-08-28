@@ -412,13 +412,13 @@ def main_PSF_atmos(Args):
                                                                   filt)
         index_table['NUMBER'][num] = num
         input_p1 = cg_fn.Eu_Args(scale=0.03, disk_SED_name=dSED,
-                                 bulge_e=e_s, disk_e=e_s,
-                                 psf_sig_o=0.071, psf_w_o=806)
+                                 psf_sig_o=0.071, psf_w_o=806,
+                                 bulge_e=e_s, disk_e=e_s)  # , redshift=0.12)
         index_table['redshift'][num] = input_p1.redshift
         CRG1, CRG2 = get_CRG(input_p1)
         # parametric
         input_p2 = cg_fn.LSST_Args(disk_SED_name=dSED,
-                                   bulge_e=e_s, disk_e=e_s)
+                                   bulge_e=e_s, disk_e=e_s)  # redshift=0.12)
         para_gal = get_lsst_para(input_p2)
         # Compute CG bias
         meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix)
@@ -433,7 +433,8 @@ def main_PSF_atmos(Args):
         meas_cg_bias_basic(para_gal, chr_psf, meas_args,
                            index_table[num], 'para')
         index_table['zenith_angle'][num] = angle
-    op_file = 'results/ref_gal_cg_bias_var_psig_{0}_band.fits'.format(filt)
+    op_file = 'results/ref_gal_atm_psf_{0}_dsed_{1}_band.fits'.format(dSED,
+                                                                      filt)
     index_table.write(op_file, format='fits',
                       overwrite=True)
     print "Saving output at", op_file
