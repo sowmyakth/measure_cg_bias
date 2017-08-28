@@ -13,3 +13,6 @@ analysis.
 
 data directory contains template SEDs, LSST filter response curves, and HST noise
 correlation functions used in the analysis.
+
+Overleaf file(in progress) summarizing measurement techniques and results can be found
+[here](https://www.overleaf.com/read/wqztwvtnxhvn).
