@@ -25,14 +25,14 @@ import cg_functions as cg_fn
 galsim.ChromaticConvolution.resize_effective_prof_cache(5)
 
 
-def get_table(num):
+def get_table(num, g_size):
     names = ('NUMBER', 'redshift', 'para_g_cg', 'para_g_no_cg',
              'CRG_g_cg', 'CRG_g_no_cg', 'CRG_tru_g_cg', 'CRG_tru_g_no_cg',
              'para_m1', 'CRG_m1', 'CRG_tru_m1', 'para_m2', 'CRG_m2',
              'CRG_tru_m2', 'para_c1', 'CRG_c1', 'CRG_tru_c1', 'para_c2',
              'CRG_c2', 'CRG_tru_c2')
     dtype = ['int'] + ['float'] * 19
-    cols = [range(num), np.zeros(num)] + [np.ones([num, 2, 2])*-10] * 6 + [np.ones([num, 3])*-10] * 12
+    cols = [range(num), np.zeros(num)] + [np.ones([num, g_size, 2])*-10] * 6 + [np.ones([num, 3])*-10] * 12
     index_table = Table(cols, names=names, dtype=dtype)
     return index_table
 
@@ -440,6 +440,41 @@ def main_PSF_atmos(Args):
     print "Saving output at", op_file
 
 
+def main_check_def(Args):
+    """Measure CG bias for differnt input shear values.disk_SED_name
+    This is to verify our definition of additive and multiplicative CG bias
+    Aim of script is to check linearity of gcg-gnocg vs gtrue
+    """
+    e_s = [0.3, 0.3]
+    filt = Args.filter
+    g = np.linspace(0.005, 0.01, 10)
+    rt_g = np.array([g, g]).T
+    npix = 360
+    num = 1
+    index_table = get_table(num, len(rt_g))
+    input_p1 = cg_fn.Eu_Args(scale=0.03,
+                             bulge_e=e_s, disk_e=e_s,
+                             psf_sig_o=0.071, psf_w_o=806)
+    index_table['redshift'][0] = input_p1.redshift
+    CRG1, CRG2 = get_CRG(input_p1)
+    # parametric galaxy
+    input_p2 = cg_fn.LSST_Args(bulge_e=e_s, disk_e=e_s)
+    para_gal = get_lsst_para(input_p2)
+    meas_args = cg_fn.meas_args(rt_g=rt_g, npix=npix)
+    meas_args.bp = galsim.Bandpass('data/baseline/total_%s.dat'%filt,
+                                   wave_type='nm').thin(rel_err=1e-4)
+    psf_args = cg_fn.psf_params()
+    meas_cg_bias(CRG1, index_table[0], meas_args,
+                 psf_args, 'CRG')
+    meas_cg_bias(CRG2, index_table[0], meas_args,
+                 psf_args, 'CRG_tru')
+    meas_cg_bias(para_gal, index_table[0], meas_args,
+                 psf_args, 'para')
+    op_file = 'results/ref_gal_cg_bias_check_def_{0}_band.fits'.format(filt)
+    index_table.write(op_file, format='fits',
+                      overwrite=True)
+    print "Saving output at", op_file
+
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -454,4 +489,5 @@ if __name__ == "__main__":
     # main_variable_PSF_alpha(args)
     # main_variable_weight(args)
     # main_variable_shear_est(args)
-    main_PSF_atmos(args)
+    # main_PSF_atmos(args)
+    main_check_def(args)
