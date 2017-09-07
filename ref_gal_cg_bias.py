@@ -133,7 +133,7 @@ def main_variable_dSED(Args):
     npix = 360
     num = len(redshifts)
     for dSED in dSEDs:
-        index_table = get_table(num)
+        index_table = get_table(num, len(rt_g))
         for z_num, z in enumerate(redshifts):
             print "Creating gal at redshift {0} in {1} band".format(z, filt)
             index_table['redshift'][z_num] = z
@@ -177,7 +177,7 @@ def main_variable_PSF(Args):
     npix = 360
     p_sigs = np.linspace(0.1, 0.6, 8)
     num = len(p_sigs)
-    index_table = get_table(num)
+    index_table = get_table(num, len(rt_g))
     col = Column(np.ones(num) * -10, name='psf_sigma')
     index_table.add_column(col)
     for num, p_sig in enumerate(p_sigs):
@@ -226,7 +226,7 @@ def main_variable_PSF_alpha(Args):
     npix = 360
     alphas = np.linspace(-1, 1, 8)
     num = len(alphas)
-    index_table = get_table(num)
+    index_table = get_table(num, len(rt_g))
     col = Column(np.ones(num) * -10, name='alpha')
     index_table.add_column(col)
     for num, alpha in enumerate(alphas):
@@ -275,7 +275,7 @@ def main_variable_weight(Args):
     npix = 360
     weights = np.linspace(0.4, 1.6, 11)
     num = len(weights)
-    index_table = get_table(num)
+    index_table = get_table(num, len(rt_g))
     col = Column(np.ones(num) * -10, name='weight_sigma')
     index_table.add_column(col)
     for num, weight in enumerate(weights):
@@ -327,7 +327,7 @@ def main_variable_shear_est(Args):
     npix = 360
     num = len(redshifts)
     for method in methods:
-        index_table = get_table(num)
+        index_table = get_table(num, len(rt_g))
         for z_num, z in enumerate(redshifts):
             print "Creating gal at redshift {0} in {1} band".format(z, filt)
             index_table['redshift'][z_num] = z
@@ -404,7 +404,7 @@ def main_PSF_atmos(Args):
     npix = 360
     angles = np.linspace(0, 45, 5)
     num = len(angles)
-    index_table = get_table(num)
+    index_table = get_table(num, len(rt_g))
     col = Column(np.ones(num) * -10, name='zenith_angle')
     index_table.add_column(col)
     for num, angle in enumerate(angles):
