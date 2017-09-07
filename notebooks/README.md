@@ -58,5 +58,13 @@ almost the same width as r band (i band is slightly smaller but this does not ef
 We add emission lines to the disk spectra of 50 catsim galaxies and measure the difference in cg bias
 and conclude that is does varu the bias significantly.
 
+# CRG_test_results
+Test galsim.ChromaticRealGalaxy on reference and catsim galaxies to verify that chromatic features
+are reproduced. we test CRG with true and polynomial SED and in the presence of noise
 
+# AEGIS_cg_results.ipynb
+Results from CG bias analysis of galaxies in AEGIS catalog with galsim.ChromaticRealGalaxy
 
+# show_gal
+Shows galaxy with CG used in CG bias analysis. The notebook doesn't show CG bias computations,
+but provides visuals of galaxies in the analysis.
