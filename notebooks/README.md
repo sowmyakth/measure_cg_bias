@@ -5,7 +5,7 @@ A detailed explanation of measurement techniques and results can be found
 # CG_tests_and_results
 
 ## Tests
-The initial portion shows results expected from CG analysis and hence serve as additional unit tests
+The initial portion shows results predicted from CG analysis and hence serve as additional unit tests
 complimentary to those in tests.py.
 It contains the following tests
 1. Different HSM methods
@@ -14,21 +14,20 @@ It contains the following tests
 1. PSF alpha  
 
 ### Different HSM methods
-Our definition of m_cg implies that all bias arises from color gradients only is incorporated into m_cg,
-making it independent of biases from shape measurement algorithms. For a constant weight size, the CG 
-bias computed from different shear estimation methods in [galsim.hsm](http://galsim-developers.github.io/GalSim/hsm_8py.html):
-REGAUSS, KSB, LINEAR, BJ are equal
-as expected. 
+Our definition of m_cg implies that all bias arises from color gradients "only" is incorporated into m_cg,
+making it independent of biases from shape measurement algorithms. For a constant weight size, the CG
+bias computed from different shear estimation methods in galsim.hsm : REGAUSS, KSB, LINEAR, BJ are equal
+as expected.
 
 ### Weight function
 CG bias arises when the weight function "weighs" different parts of the galaxy surface brightness profile
-differently. Thus, the magnitude of m_cg is inversely proportional to the size of the weight function, 
-disappearing when no weight function is applied.
+differently. Thus the magnitude of m_cg is inversely proportional to the size of the weight function,
+dissapearing when no weight function is applied.
 
 ### PSF size
-Intuitively we expect that when the size of the PSF is small compared to the size of the galaxy bias on 
-shear, and hence m_cg is small. Also, when the PSF is large, gradients in the galaxy profile don’t matter.
-It is useful to remember while analyzing the plots that the HLR of bulge and disks are 0.17 and 1.2 arcsecs
+Intuitively we expect that when the size of the PSF is small compared to the size of the galaxy, bias on
+shear, and hence m_cg is small. Also when the PSF is large, gradients in the galaxy profile don't matter.
+It is useful to remember while analyzing the plots that the HLR of bulge and disks are 0.17 amd 1.2 arcsecs
 respectively.
 
 
@@ -40,7 +39,7 @@ of m_cg vs alpha shows the expected dependence.
 
 ## Additional Analysis
 The notebook also shows CG bias for the following conditions different from the reference galaxy used above.
-1. Chromatic Atmosphere PSF
+1. Chromatic Atmospheric PSF
 1. I band results
 1. With emission lines
 
@@ -57,11 +56,11 @@ almost the same width as r band (i band is slightly smaller but this does not af
 
 ### With emission lines
 We add emission lines to the disk spectra of 50 catsim galaxies and measure the difference in cg bias
-and conclude that is does vary the bias significantly.
+and conclude that it does not vary the bias significantly.
 
 # CRG_test_results
 Test galsim.ChromaticRealGalaxy on reference and catsim galaxies to verify that chromatic features
-are reproduced. we test CRG with true and polynomial SED and in the presence of noise
+are reproduced. We test CRG with true and polynomial SED and in the presence of noise
 
 # AEGIS_cg_results.ipynb
 Results from CG bias analysis of galaxies in AEGIS catalog with galsim.ChromaticRealGalaxy
