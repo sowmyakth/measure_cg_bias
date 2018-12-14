@@ -23,3 +23,4 @@ with H/I postage stamp images of isolated galaxies and phometric measuremnts. De
 doument describing how the catalog was created and can be found [here](https://docs.google.com/viewer?url=https://github.com/sowmyakth/measure_cg_bias/raw/master/pdfs/Reducing_AEGIS_gal.pdf)
 2. CatSim
 
+<link rel="shortcut icon" type="image/x-icon" href="docs/favicon.ico">
