@@ -18,7 +18,8 @@ Galaxies usually do not have a uniform spectral energy densities (intensity at e
 across it's spatial profile. Galaxy color gradients denote that the galaxy has
 different colors in different places, as can be seen by this image of
 the Pinwheel galaxy (M101).
-![alt text](/docs/images/gal_example.png "galaxy with color gradient")
+
+<img src="docs/images/gal_example.jpg" alt="galaxy with color gradient" width="400"/>
 
 ## Why is there a bias?
 Weal lensing measurements involve estimating the correlations in the distortions
@@ -42,12 +43,15 @@ CG bias is estimated for three types of galaxy simulations:
 1. Reference parametric galaxy with bulge and disk: Since most galaxies important
 for WL measurements are well approximated by elliptical Sersic bulge + disk profiles,
 we simulate galaxies with no noise like this
-![alt text](/docs/images/sersic_gal.png "sersic galaxy with color gradient")
+
+<img src="docs/images/sersic_gal.png" alt="sersic galaxy with color gradient" width="150"/>
+
 2. Galaxies from CatSim (Catalog Simulator) with a range of color gradients that
 could be observed with LSST.
 3. HST V/I band images from AEGIS survey are redrawn as would be seen by LSST. These
 are real galaxy images with noise.
-![alt text](/docs/images/hst_gal.png "real galaxy")
+
+<img src="docs/images/hst_gal.png" alt="real galaxy" width="200"/>
 
 The download-able AEGIS [catalog](http://great3.jb.man.ac.uk/leaderboard/data/public/AEGIS_training_sample.tar.gz)
 contains postage stamp images of isolated galaxies and photometric measurements
@@ -60,4 +64,5 @@ than the LSST requirements on shear bias. However the bias from noisy galaxy ima
 shows a strong dependence on the signal-to noise ratio or SNR of the galaxy.
 The magnitude of mean CG bias $<0.0009$, based on AEGIS galaxies with SNR $> 100$
 is lower than the LSST requirement of 0.003.
-![alt text](/docs/images/results.png "cg bias results from aegis galaxies")
+
+<img src="docs/images/results.png" alt="aegis cg bias" width="300"/>
