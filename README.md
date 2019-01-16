@@ -38,7 +38,7 @@ equivalent galaxy with no color gradients. Impact from all systematics other tha
 CG will be the same for the two galaxies, thereby giving an estimate of bias from
 CG only.
 
-<img src="docs/images/flowchart.png" alt="flowcahrt" width="150"/>
+<img src="docs/images/flow_chart.png" alt="flowchart" width="400"/>
 
 ## What is the dataset?
 CG bias is estimated for three types of galaxy simulations:
@@ -46,14 +46,14 @@ CG bias is estimated for three types of galaxy simulations:
 for WL measurements are well approximated by elliptical Sersic bulge + disk profiles,
 we simulate galaxies with no noise like this
 
-<img src="docs/images/sersic_gal.png" alt="sersic galaxy with color gradient" width="150"/>
+<img src="docs/images/sersic_gal.png" alt="sersic galaxy with color gradient" width="200"/>
 
 2. Galaxies from CatSim (Catalog Simulator) with a range of color gradients that
 could be observed with LSST.
 3. HST V/I band images from AEGIS survey are redrawn as would be seen by LSST. These
 are real galaxy images with noise.
 
-<img src="docs/images/hst_gal.png" alt="real galaxy" width="200"/>
+<img src="docs/images/hst_gal.png" alt="real galaxy" width="250"/>
 
 The download-able AEGIS [catalog](http://great3.jb.man.ac.uk/leaderboard/data/public/AEGIS_training_sample.tar.gz)
 contains postage stamp images of isolated galaxies and photometric measurements
@@ -67,4 +67,4 @@ shows a strong dependence on the signal-to noise ratio or SNR of the galaxy.
 The magnitude of mean CG bias <0.0009, based on AEGIS galaxies with SNR > 100
 is lower than the LSST requirement of 0.003.
 
-<img src="docs/images/results.png" alt="aegis cg bias" width="300"/>
+<img src="docs/images/results.png" alt="aegis cg bias" width="400"/>
