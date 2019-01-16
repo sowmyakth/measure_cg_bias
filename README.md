@@ -38,6 +38,8 @@ equivalent galaxy with no color gradients. Impact from all systematics other tha
 CG will be the same for the two galaxies, thereby giving an estimate of bias from
 CG only.
 
+<img src="docs/images/flowchart.png" alt="flowcahrt" width="150"/>
+
 ## What is the dataset?
 CG bias is estimated for three types of galaxy simulations:
 1. Reference parametric galaxy with bulge and disk: Since most galaxies important
@@ -62,7 +64,7 @@ can be found [here](https://docs.google.com/viewer?url=https://github.com/sowmya
 The bias estimated from the noise-free parametric galaxy simulations are all lower
 than the LSST requirements on shear bias. However the bias from noisy galaxy images
 shows a strong dependence on the signal-to noise ratio or SNR of the galaxy.
-The magnitude of mean CG bias $<0.0009$, based on AEGIS galaxies with SNR $> 100$
+The magnitude of mean CG bias <0.0009, based on AEGIS galaxies with SNR > 100
 is lower than the LSST requirement of 0.003.
 
 <img src="docs/images/results.png" alt="aegis cg bias" width="300"/>
