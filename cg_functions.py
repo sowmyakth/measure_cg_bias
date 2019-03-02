@@ -316,7 +316,6 @@ def get_gal_nocg(Args, gal_cg,
     gal_cg_eff_img = con.drawImage(Args.bp, scale=Args.scale / 4.0,
                                    nx=Args.npix * 6, ny=Args.npix * 6,
                                    method='no_pixel')
-    # print "Get effective galaxy "
     gal_cg_eff = galsim.InterpolatedImage(gal_cg_eff_img,
                                           calculate_stepk=False,
                                           calculate_maxk=False)
@@ -561,7 +560,6 @@ def calc_cg_crg(crg, meas_args,
     chr_psf = get_gaussian_PSF(psf_args)
     gal_cg = crg
     meas_args.c_SED = crg.SED
-    # print " Get gal with no CG"
     gal_nocg = get_gal_nocg(meas_args, gal_cg,
                             chr_psf)
     # compute HLR of galaxy with CG & set it as the size of the weight function
@@ -570,8 +568,7 @@ def calc_cg_crg(crg, meas_args,
         im1 = con_cg.drawImage(meas_args.bp, nx=meas_args.npix,
                                ny=meas_args.npix, scale=meas_args.scale)
         meas_args.sig_w = (getHLR(im1.array) * meas_args.scale)
-        print 'Sigma of weight fn:', meas_args.sig_w
-    # print " Ring test on gal with cg"
+        print('Sigma of weight fn:', meas_args.sig_w)
     g_cg = ring_test_single_gal(meas_args, gal_cg,
                                 chr_psf)
     g_ncg = ring_test_single_gal(meas_args, gal_nocg,
@@ -649,7 +646,6 @@ def calc_cg_basic(gal_cg, chr_psf, meas_args,
                         as weight size
     @return  shear computed from galaxy with CG and galaxy with no CG ."""
     meas_args.c_SED = gal_cg.SED
-    # print " Get gal with no CG"
     gal_nocg = get_gal_nocg(meas_args, gal_cg,
                             chr_psf)
     # compute HLR of galaxy with CG & set it as the size of the weight function
@@ -658,8 +654,7 @@ def calc_cg_basic(gal_cg, chr_psf, meas_args,
         im1 = con_cg.drawImage(meas_args.bp, nx=meas_args.npix,
                                ny=meas_args.npix, scale=meas_args.scale)
         meas_args.sig_w = (getHLR(im1.array) * meas_args.scale)
-        print 'Sigma of weight fn:', meas_args.sig_w
-    # print " Ring test on gal with cg"
+        print('Sigma of weight fn:', meas_args.sig_w)
     g_cg = ring_test_single_gal(meas_args, gal_cg,
                                 chr_psf)
     g_ncg = ring_test_single_gal(meas_args, gal_nocg,
