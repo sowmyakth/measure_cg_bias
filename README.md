@@ -70,4 +70,4 @@ Therefore, for both the noise-free parametric galaxies and for the AEGIS galaxie
   
 The values of CG bias are summarized in the table below. Refer this [document](https://www.overleaf.com/read/btzzycnnrfzs) explaining the results in detail.
 
-<img src="docs/images/results.png" alt="summary" width="400"/>
+<img src="docs/images/results_summary.png" alt="summary" width="400"/>
