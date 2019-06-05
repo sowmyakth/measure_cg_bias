@@ -2,7 +2,7 @@
 # measure_cg_bias
 This repository contains script to estimate bias from galaxy color gradients on WL measurements
 with the Large Synoptic Survey Telescope (LSST). For a more in-depth understanding,
-refer to this [document](https://www.overleaf.com/read/wqztwvtnxhvn) describing
+refer to this [document](https://www.overleaf.com/read/btzzycnnrfzs) describing
 measurement techniques and results in detail.
 
 [notebooks](https://github.com/sowmyakth/measure_cg_bias/tree/master/notebooks)
