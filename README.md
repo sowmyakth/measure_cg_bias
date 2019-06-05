@@ -65,6 +65,7 @@ can be found [here](https://docs.google.com/viewer?url=https://github.com/sowmya
 ## How big is the bias?
 For noise-free parametric galaxy simulations, the value of half the maximum span of m<sub>CG</sub>(z) in the redshift range [0, 1.2] is < 1.5 x 10<sup>-3</sup> for the reference galaxies with extreme color gradients and < 10<sup>-4</sup> CatSim galaxies. For input AEGIS galaxies with pixel noise, the estimated bias shows a strong dependence on SNR due to contributions from effects other than CG.However, for AEGIS galaxies with HST I-band SNR > 200, the magnitude of the mean estimated bias is <0.0009, while the value of half the maximum span of m<sub>CG</sub>(z) is < 1.5 x 10<sup>-4</sup>. 
 Therefore, for both the noise-free parametric galaxies and for the AEGIS galaxies with SNR > 200, the half-maximum span is less than the LSST full-depth requirement of 0.003 on the total systematic uncertainty in the redshift-dependent shear calibration m<sub>z</sub>(z). 
+
 <img src="docs/images/aegis_results.png" alt="aegis cg bias" width="400"/>
   
 The values of CG bias are summarized in the table below. Refer this [document](https://www.overleaf.com/read/btzzycnnrfzs) explaining the results in detail.
