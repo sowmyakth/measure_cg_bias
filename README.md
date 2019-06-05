@@ -32,12 +32,14 @@ be biased.
 
 ## How do we estimate CG bias?
 Several different systematics can bias shear estimates. Thus, to isolate bias from
-color gradientss (CG) only we compare the shear measured from a galaxy with color gradients to an
+color gradients (CG) only we compare the shear measured from a galaxy with color gradients to an
 equivalent galaxy with no color gradients. Impact from all systematics other than
 CG will be the same for the two galaxies, thereby giving an estimate of bias from
 CG only.
 
 <img src="docs/images/flow_chart.png" alt="flowchart" width="400"/>
+
+This study is focused on estimating the multiplicative shear bias from CG, m<sub>CG</sub>(z), produced when the PSF size depends on wavelength, at different galaxy redshifts, z.
 
 ## What is the dataset?
 CG bias is estimated for three types of galaxy images:
