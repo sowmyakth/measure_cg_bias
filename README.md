@@ -1,4 +1,3 @@
-[![Code Health](https://landscape.io/github/sowmyakth/measure_cg_bias/master/landscape.svg?style=flat)](https://landscape.io/github/sowmyakth/measure_cg_bias/master)
 # measure_cg_bias
 This repository contains script to estimate bias from galaxy color gradients on WL measurements
 with the Large Synoptic Survey Telescope (LSST). For a more in-depth understanding,
