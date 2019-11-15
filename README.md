@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3543686.svg)](https://doi.org/10.5281/zenodo.3543686)
+
 # measure_cg_bias
 This repository contains script to estimate bias on weak lensing (WL) measurements
 with the Large Synoptic Survey Telescope (LSST) from galaxy color gradients. For a more in-depth understanding,
